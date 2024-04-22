@@ -10,3 +10,5 @@ class Tool {
     this.description = description;
   }
 }
+
+export default Tool;
