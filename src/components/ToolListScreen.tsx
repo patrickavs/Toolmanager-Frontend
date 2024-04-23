@@ -1,52 +1,43 @@
 import React, {useEffect, useState} from 'react';
 import {Button, FlatList, Text, View} from 'react-native';
-import axios from 'axios';
+import {
+  getTools,
+  addTool,
+  updateTool,
+  removeTool,
+  getMaterials,
+  addMaterial,
+  updateMaterial,
+  removeMaterial,
+} from '../service/api.ts';
 import ListItem from './ListItemView.tsx';
 import Item from './Item.ts';
 
 interface ListProps<T extends Item> {
   title: string;
-  data: T[];
-  onAddItem: (newItem: T) => void;
-  onDeleteItem: (id: string) => void;
-  onUpdateItem: (id: string, updatedItem: Partial<T>) => void;
 }
 
-const MONGODB_URL = 'mongodb://localhost:27017/';
-
-function CustomList<T extends Item>({
-  title,
-  data,
-  onAddItem,
-  onDeleteItem,
-  onUpdateItem,
-}: ListProps<T>) {
-  const [items, setItems] = useState<T[]>(data || []);
-
-  const fetchData = async () => {
-    try {
-      const endpoint =
-        title.toLowerCase() === 'tools' ? 'get_tools' : 'get_materials'; // Adapt endpoint based on title
-      const response = await axios.get<T[]>(`${MONGODB_URL}${endpoint}`);
-      setItems(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+function CustomList<T extends Item>({title}: ListProps<T>) {
+  const [items, setItems] = useState<T[]>([]);
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const handleAddItem = async (newItem: T) => {
+  const fetchData = async () => {
     try {
-      const endpoint = title.toLowerCase() === 'tools' ? 'tools' : 'materials'; // Adapt endpoint based on title
-      const response = await axios.post(
-        `${MONGODB_URL}${endpoint}/${newItem.id}`,
-        newItem,
-      );
-      console.log(`${title} added:`, response.data);
-      await fetchData(); // Re-fetch data after adding
+      const toolsData = await getTools();
+      const materialsData = await getMaterials();
+      setItems([...toolsData, ...materialsData]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleAddItem = async () => {
+    try {
+      const newItem = await addTool('New Tool');
+      setItems([...items, newItem]);
     } catch (error) {
       console.error('Error adding item:', error);
     }
@@ -54,10 +45,7 @@ function CustomList<T extends Item>({
 
   const handleDelete = async (id: string) => {
     try {
-      const endpoint =
-        title.toLowerCase() === 'tools' ? 'delete_tool' : 'delete_material'; // Adapt endpoint based on title
-      const response = await axios.delete(`${MONGODB_URL}${endpoint}/${id}`);
-      console.log(`${title} deleted:`, response.data);
+      await removeTool(id);
       setItems(items.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error deleting item:', error);
@@ -66,19 +54,8 @@ function CustomList<T extends Item>({
 
   const handleUpdate = async (id: string, updatedItem: Partial<T>) => {
     try {
-      const endpoint =
-        title.toLowerCase() === 'tools' ? 'update_tool' : 'update_material'; // Adapt endpoint based on title
-      const response = await axios.put(
-        `${MONGODB_URL}${endpoint}/${id}`,
-        updatedItem,
-      );
-      console.log(`${title} updated:`, response.data);
-      const updatedIndex = items.findIndex(item => item.id === id);
-      setItems([
-        ...items.slice(0, updatedIndex),
-        {...items.slice(updatedIndex)[0], ...updatedItem},
-        ...items.slice(updatedIndex + 1),
-      ]);
+      const updatedTool = await updateTool(id, updatedItem);
+      setItems(items.map(item => (item.id === id ? updatedTool : item)));
     } catch (error) {
       console.error('Error updating item:', error);
     }
@@ -100,7 +77,7 @@ function CustomList<T extends Item>({
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
-      <Button title="Add Item" onPress={() => handleAddItem()} />
+      <Button title="Add Item" onPress={handleAddItem} />
     </View>
   );
 }

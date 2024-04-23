@@ -6,6 +6,8 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
+// Tools
+
 const getTools = async () => {
   try {
     const response = await api.get('/tools');
@@ -26,6 +28,16 @@ const addTool = async toolName => {
   }
 };
 
+const updateTool = async (toolId, data) => {
+  try {
+    const response = await api.put(`/tools/${toolId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating tool:', error);
+    throw error;
+  }
+};
+
 const removeTool = async toolId => {
   try {
     await api.delete(`/tools/${toolId}`);
@@ -35,4 +47,54 @@ const removeTool = async toolId => {
   }
 };
 
-export {getTools, addTool, removeTool};
+// Materials
+
+const getMaterials = async () => {
+  try {
+    const response = await api.get('/materials');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching materials:', error);
+    throw error;
+  }
+};
+
+const addMaterial = async materialName => {
+  try {
+    const response = await api.post('/materials', { name: materialName });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding material:', error);
+    throw error;
+  }
+};
+
+const updateMaterial = async (materialId, data) => {
+  try {
+    const response = await api.put(`/materials/${materialId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating material:', error);
+    throw error;
+  }
+};
+
+const removeMaterial = async materialId => {
+  try {
+    await api.delete(`/materials/${materialId}`);
+  } catch (error) {
+    console.error('Error removing material:', error);
+    throw error;
+  }
+};
+
+export {
+  getTools,
+  addTool,
+  removeTool,
+  updateTool,
+  getMaterials,
+  addMaterial,
+  updateMaterial,
+  removeMaterial,
+};
