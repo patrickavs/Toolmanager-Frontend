@@ -13,11 +13,7 @@ import {
 import ListItem from './ListItemView.tsx';
 import Item from './Item.ts';
 
-interface ListProps<T extends Item> {
-  title: string;
-}
-
-function CustomList<T extends Item>({title}: ListProps<T>) {
+function CustomListView<T extends Item>({title}) {
   const [items, setItems] = useState<T[]>([]);
 
   useEffect(() => {
@@ -70,7 +66,7 @@ function CustomList<T extends Item>({title}: ListProps<T>) {
   );
 
   return (
-    <View>
+    <>
       <Text style={{fontSize: 20, marginBottom: 10}}>{title}</Text>
       <FlatList
         data={items}
@@ -78,8 +74,8 @@ function CustomList<T extends Item>({title}: ListProps<T>) {
         keyExtractor={item => item.id}
       />
       <Button title="Add Item" onPress={handleAddItem} />
-    </View>
+    </>
   );
 }
 
-export default CustomList;
+export default CustomListView;

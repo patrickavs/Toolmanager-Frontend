@@ -1,14 +1,15 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import CustomList from './components/ToolListScreen.tsx';
+import CustomListView from './components/CustomList.tsx';
 import {NavigationContainer} from '@react-navigation/native';
 import {BuildOutlined, ToolOutlined} from '@ant-design/icons';
 import React from 'react';
+import { getMaterials, getTools } from "./service/api.ts";
 
-function ToolsScreen({title}) {
+function ToolScreen({title}) {
   return (
-    <CustomList
+    <CustomListView
       title={title}
-      data={[]}
+      data={[getTools()]}
       onAddItem={item => console.log('Added item:', item)}
       onDeleteItem={index => console.log('Deleted item at index:', index)}
       onUpdateItem={(index, item) =>
@@ -18,11 +19,11 @@ function ToolsScreen({title}) {
   );
 }
 
-function ToolMaterialsScreen({title}) {
+function MaterialScreen({title}) {
   return (
-    <CustomList
+    <CustomListView
       title={title}
-      data={[]}
+      data={getMaterials()}
       onAddItem={item => console.log('Added item:', item)}
       onDeleteItem={index => console.log('Deleted item at index:', index)}
       onUpdateItem={(index, item) =>
@@ -40,20 +41,20 @@ const App: React.FC = () => {
       <Tab.Navigator
         screenOptions={({route}) => ({
           tabBarIcon: ({color}) =>
-            route.name === 'ToolsScreen' ? (
+            route.name === 'ToolScreen' ? (
               <ToolOutlined color={color} />
             ) : (
               <BuildOutlined color={color} />
             ),
         })}>
         <Tab.Screen
-          name="ToolsScreen"
-          component={ToolsScreen}
+          name="ToolScreen"
+          component={ToolScreen}
           props={{title: 'My Tools List'}}
         />
         <Tab.Screen
-          name="ToolMaterialsScreen"
-          component={ToolMaterialsScreen}
+          name="MaterialScreen"
+          component={MaterialScreen}
           props={{title: 'Tool Materials'}}
         />
       </Tab.Navigator>
