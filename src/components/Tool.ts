@@ -1,12 +1,19 @@
+import Material from './Material.ts';
+
 class Tool {
-  id: number;
+  id: string;
   name: string;
-  category: string;
+  materials: [Material];
   description: string;
-  constructor(id: number, name: string, category: string, description: string) {
+  constructor(
+    id: string,
+    name: string,
+    materials: [Material] = [],
+    description: string,
+  ) {
     this.id = id;
     this.name = name;
-    this.category = category;
+    this.materials = materials;
     this.description = description;
   }
 }

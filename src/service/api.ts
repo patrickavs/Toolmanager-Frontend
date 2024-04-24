@@ -18,7 +18,7 @@ const getTools = async () => {
   }
 };
 
-const addTool = async toolName => {
+const addTool = async (toolName: string) => {
   try {
     const response = await api.post('/tools', {name: toolName});
     return response.data;
@@ -28,7 +28,7 @@ const addTool = async toolName => {
   }
 };
 
-const updateTool = async (toolId, data) => {
+const updateTool = async (toolId: string, data: {}) => {
   try {
     const response = await api.put(`/tools/${toolId}`, data);
     return response.data;
@@ -38,7 +38,7 @@ const updateTool = async (toolId, data) => {
   }
 };
 
-const removeTool = async toolId => {
+const removeTool = async (toolId: string) => {
   try {
     await api.delete(`/tools/${toolId}`);
   } catch (error) {
@@ -59,9 +59,9 @@ const getMaterials = async () => {
   }
 };
 
-const addMaterial = async materialName => {
+const addMaterial = async (materialName: string) => {
   try {
-    const response = await api.post('/materials', { name: materialName });
+    const response = await api.post('/materials', {name: materialName});
     return response.data;
   } catch (error) {
     console.error('Error adding material:', error);
@@ -69,7 +69,7 @@ const addMaterial = async materialName => {
   }
 };
 
-const updateMaterial = async (materialId, data) => {
+const updateMaterial = async (materialId: string, data: {}) => {
   try {
     const response = await api.put(`/materials/${materialId}`, data);
     return response.data;
@@ -79,7 +79,7 @@ const updateMaterial = async (materialId, data) => {
   }
 };
 
-const removeMaterial = async materialId => {
+const removeMaterial = async (materialId: string) => {
   try {
     await api.delete(`/materials/${materialId}`);
   } catch (error) {

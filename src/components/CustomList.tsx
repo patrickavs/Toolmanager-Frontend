@@ -1,38 +1,60 @@
 import React, {useEffect, useState} from 'react';
-import {Button, FlatList, Text, View} from 'react-native';
+import {Button, FlatList, Text} from 'react-native';
+
 import {
   getTools,
   addTool,
   updateTool,
   removeTool,
   getMaterials,
-  addMaterial,
   updateMaterial,
   removeMaterial,
+  addMaterial,
 } from '../service/api.ts';
-import ListItem from './ListItemView.tsx';
-import Item from './Item.ts';
 
-function CustomListView<T extends Item>({title}) {
+import ListItem from './ListItemView.tsx';
+
+import Tool from './Tool.ts';
+import Material from './Material.ts';
+
+type ItemType = Tool | Material;
+
+function CustomListView<T extends ItemType>({
+  title,
+  type,
+}: {
+  title: string;
+  type: T;
+}) {
   const [items, setItems] = useState<T[]>([]);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchData = async () => {
+      try {
+        let data: T[];
+        if (type === Tool) {
+          data = await getTools();
+        } else {
+          data = await getMaterials();
+        }
+        setItems(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-  const fetchData = async () => {
-    try {
-      const toolsData = await getTools();
-      const materialsData = await getMaterials();
-      setItems([...toolsData, ...materialsData]);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+    fetchData().then(r => console.log(r));
+  }, [type]);
 
   const handleAddItem = async () => {
     try {
-      const newItem = await addTool('New Tool');
+      const newItemName = 'New ' + (type === Tool ? 'Tool' : 'Material');
+      let newItem: T;
+      if (type === Tool) {
+        newItem = await addTool(newItemName);
+      } else {
+        newItem = await addMaterial(newItemName);
+      }
       setItems([...items, newItem]);
     } catch (error) {
       console.error('Error adding item:', error);
@@ -41,7 +63,11 @@ function CustomListView<T extends Item>({title}) {
 
   const handleDelete = async (id: string) => {
     try {
-      await removeTool(id);
+      if (type === Tool) {
+        await removeTool(id);
+      } else {
+        await removeMaterial(id);
+      }
       setItems(items.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error deleting item:', error);
@@ -50,8 +76,13 @@ function CustomListView<T extends Item>({title}) {
 
   const handleUpdate = async (id: string, updatedItem: Partial<T>) => {
     try {
-      const updatedTool = await updateTool(id, updatedItem);
-      setItems(items.map(item => (item.id === id ? updatedTool : item)));
+      let updatedData: any;
+      if (type === Tool) {
+        updatedData = await updateTool(id, updatedItem);
+      } else {
+        updatedData = await updateMaterial(id, updatedItem);
+      }
+      setItems(items.map(item => (item.id === id ? updatedData : item)));
     } catch (error) {
       console.error('Error updating item:', error);
     }
