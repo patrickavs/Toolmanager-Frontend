@@ -1,6 +1,8 @@
 import axios from 'axios';
+import Tool from '../components/Tool.ts';
+import Material from '../components/Material.ts';
 
-const BASE_URL = 'http://127.0.0.1:5000';
+const BASE_URL = 'http://10.0.2.2:5000';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -18,9 +20,14 @@ const getTools = async () => {
   }
 };
 
-const addTool = async (toolName: string) => {
+const addTool = async (tool: Tool) => {
   try {
-    const response = await api.post('/tools', {name: toolName});
+    const response = await api.post('tools', {
+      id: tool.id,
+      name: tool.name,
+      materials: tool.materials,
+      description: tool.description,
+    });
     return response.data;
   } catch (error) {
     console.error('Fehler beim Hinzufügen des Tools:', error);
@@ -30,7 +37,7 @@ const addTool = async (toolName: string) => {
 
 const updateTool = async (toolId: string, data: {}) => {
   try {
-    const response = await api.put(`/tools/${toolId}`, data);
+    const response = await api.put(`tools/${toolId}`, data);
     return response.data;
   } catch (error) {
     console.error('Error updating tool:', error);
@@ -40,7 +47,7 @@ const updateTool = async (toolId: string, data: {}) => {
 
 const removeTool = async (toolId: string) => {
   try {
-    await api.delete(`/tools/${toolId}`);
+    await api.delete(`tools/${toolId}`);
   } catch (error) {
     console.error('Fehler beim Entfernen des Tools:', error);
     throw error;
@@ -59,9 +66,14 @@ const getMaterials = async () => {
   }
 };
 
-const addMaterial = async (materialName: string) => {
+const addMaterial = async (material: Material) => {
   try {
-    const response = await api.post('/materials', {name: materialName});
+    const response = await api.post('materials', {
+      id: material.id,
+      name: material.name,
+      tools: material.tools,
+      description: material.description,
+    });
     return response.data;
   } catch (error) {
     console.error('Error adding material:', error);
@@ -71,7 +83,7 @@ const addMaterial = async (materialName: string) => {
 
 const updateMaterial = async (materialId: string, data: {}) => {
   try {
-    const response = await api.put(`/materials/${materialId}`, data);
+    const response = await api.put(`materials/${materialId}`, data);
     return response.data;
   } catch (error) {
     console.error('Error updating material:', error);
@@ -81,7 +93,7 @@ const updateMaterial = async (materialId: string, data: {}) => {
 
 const removeMaterial = async (materialId: string) => {
   try {
-    await api.delete(`/materials/${materialId}`);
+    await api.delete(`materials/${materialId}`);
   } catch (error) {
     console.error('Error removing material:', error);
     throw error;

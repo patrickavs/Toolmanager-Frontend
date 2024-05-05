@@ -1,21 +1,10 @@
 import Material from './Material.ts';
 
-class Tool {
+interface Tool {
   id: string;
   name: string;
-  materials: [Material];
+  materials: Material[];
   description: string;
-  constructor(
-    id: string,
-    name: string,
-    materials: [Material] = [],
-    description: string,
-  ) {
-    this.id = id;
-    this.name = name;
-    this.materials = materials;
-    this.description = description;
-  }
 }
 
 export default Tool;
