@@ -13,9 +13,24 @@ const ListItem: React.FC<ListItemProps> = ({
   onUpdateItem,
 }) => {
   return (
-    <View key={item.id} style={{flexDirection: 'row', marginBottom: 5}}>
-      <Text>{item.name}</Text>
-      <View style={{flex: 1, alignItems: 'flex-end'}}>
+    <View
+      key={item.id}
+      style={{
+        flexDirection: 'row',
+        marginBottom: 10,
+        marginHorizontal: 10,
+        backgroundColor: 'lightgray',
+        elevation: 2,
+        borderRadius: 10,
+        alignItems: 'center',
+        paddingStart: 10,
+      }}>
+      <Text style={{fontSize: 15}}>{item.name}</Text>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'flex-end',
+        }}>
         <Button title="Delete" onPress={() => onDeleteItem(item.id)} />
         <Button
           title="Update"

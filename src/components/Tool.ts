@@ -1,7 +1,7 @@
 import Material from './Material.ts';
 
 interface Tool {
-  id: string;
+  _id: string;
   name: string;
   materials: Material[];
   description: string;

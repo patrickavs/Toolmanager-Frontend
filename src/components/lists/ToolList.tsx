@@ -4,13 +4,13 @@ import {Button, FlatList, Text, TextInput, View, Modal} from 'react-native';
 import {getTools, addTool, updateTool, removeTool} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
-import {generate} from 'shortid';
+import ObjectID from 'bson-objectid';
 
 const initialState: Tool = {
+  _id: ObjectID().toHexString(),
   name: '',
   description: '',
   materials: [],
-  id: generate(),
 };
 
 const ToolList = () => {
@@ -103,11 +103,11 @@ const ToolList = () => {
 
   return (
     <>
-      <Text style={{fontSize: 20, marginBottom: 10}}>Tools</Text>
       <FlatList
         data={tools}
         renderItem={renderTool}
         keyExtractor={item => item.id}
+        style={{marginTop: 20}}
       />
       <Button
         color={'green'}
@@ -118,6 +118,7 @@ const ToolList = () => {
         animationType="slide"
         transparent={true}
         visible={isAddItemModalVisible}
+        style={{borderRadius: 10}}
         onRequestClose={() => setIsAddItemModalVisible(false)}>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <View style={{backgroundColor: 'white', padding: 20}}>

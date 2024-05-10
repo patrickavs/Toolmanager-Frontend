@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
+import ObjectID from "bson-objectid";
 
 const BASE_URL = 'http://10.0.2.2:5000';
 
@@ -22,23 +23,16 @@ const getTools = async () => {
 
 const addTool = async (tool: Tool) => {
   try {
-    const response = await api.post('tools', {
-      id: tool.id,
-      name: tool.name,
-      materials: tool.materials,
-      description: tool.description,
-    });
-    return response.data;
+    await api.post('tools', tool);
   } catch (error) {
-    console.error('Fehler beim Hinzufügen des Tools:', error);
+    console.error('Error adding tool:', error);
     throw error;
   }
 };
 
 const updateTool = async (toolId: string, data: {}) => {
   try {
-    const response = await api.put(`tools/${toolId}`, data);
-    return response.data;
+    await api.put(`tools/${toolId}`, data);
   } catch (error) {
     console.error('Error updating tool:', error);
     throw error;
@@ -49,7 +43,7 @@ const removeTool = async (toolId: string) => {
   try {
     await api.delete(`tools/${toolId}`);
   } catch (error) {
-    console.error('Fehler beim Entfernen des Tools:', error);
+    console.error('Error deleting tool:', error);
     throw error;
   }
 };
@@ -68,13 +62,7 @@ const getMaterials = async () => {
 
 const addMaterial = async (material: Material) => {
   try {
-    const response = await api.post('materials', {
-      id: material.id,
-      name: material.name,
-      tools: material.tools,
-      description: material.description,
-    });
-    return response.data;
+    await api.post('materials', material);
   } catch (error) {
     console.error('Error adding material:', error);
     throw error;
@@ -83,8 +71,7 @@ const addMaterial = async (material: Material) => {
 
 const updateMaterial = async (materialId: string, data: {}) => {
   try {
-    const response = await api.put(`materials/${materialId}`, data);
-    return response.data;
+    await api.put(`materials/${materialId}`, data);
   } catch (error) {
     console.error('Error updating material:', error);
     throw error;

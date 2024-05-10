@@ -9,13 +9,13 @@ import {
 } from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
-import {generate} from 'shortid';
+import ObjectID from 'bson-objectid';
 
 const initialState: Material = {
+  _id: ObjectID().toHexString(),
   name: '',
   description: '',
   tools: [],
-  id: generate(),
 };
 
 const MaterialList = () => {
@@ -108,11 +108,11 @@ const MaterialList = () => {
 
   return (
     <>
-      <Text style={{fontSize: 20, marginBottom: 10}}>Materials</Text>
       <FlatList
         data={materials}
         renderItem={renderMaterial}
         keyExtractor={item => item.id}
+        style={{marginTop: 20}}
       />
       <Button
         color={'green'}
