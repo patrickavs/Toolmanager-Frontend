@@ -1,5 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {Button, FlatList, Text, TextInput, View, Modal} from 'react-native';
+import {
+  Button,
+  FlatList,
+  Text,
+  TextInput,
+  View,
+  Modal,
+  StyleSheet,
+} from 'react-native';
 
 import {
   getMaterials,
@@ -50,7 +58,7 @@ const MaterialList = () => {
   const handleDeleteMaterial = async (id: string) => {
     try {
       await removeMaterial(id);
-      setMaterials(materials.filter(material => material.id !== id));
+      setMaterials(materials.filter(material => material._id !== id));
       await fetchMaterials();
     } catch (error) {
       console.error('Error deleting material:', error);
@@ -67,7 +75,12 @@ const MaterialList = () => {
   };
 
   const handleInputChange = (name: string, value: string) => {
-    setNewMaterial({...newMaterial, [name]: value});
+    if (name === 'tools') {
+      const toolsArray = value.split(',').map(tool => tool.trim());
+      setNewMaterial({...newMaterial, [name]: toolsArray});
+    } else {
+      setNewMaterial({...newMaterial, [name]: value});
+    }
   };
 
   const renderInputFields = () => {
@@ -75,24 +88,39 @@ const MaterialList = () => {
       <>
         <TextInput
           key="name"
-          style={{borderWidth: 1, padding: 5, marginVertical: 10}}
+          style={{
+            borderWidth: 1,
+            padding: 5,
+            marginVertical: 10,
+            borderRadius: 5,
+          }}
           placeholder="Name"
           onChangeText={text => handleInputChange('name', text)}
           value={newMaterial.name || ''}
         />
         <TextInput
           key="description"
-          style={{borderWidth: 1, padding: 5, marginVertical: 10}}
+          style={{
+            borderWidth: 1,
+            padding: 5,
+            marginVertical: 10,
+            borderRadius: 5,
+          }}
           placeholder="Description"
           onChangeText={text => handleInputChange('description', text)}
           value={newMaterial.description || ''}
         />
         <TextInput
           key="tools"
-          style={{borderWidth: 1, padding: 5, marginVertical: 10}}
+          style={{
+            borderWidth: 1,
+            padding: 5,
+            marginVertical: 10,
+            borderRadius: 5,
+          }}
           placeholder="Tools"
           onChangeText={text => handleInputChange('tools', text)}
-          value={newMaterial.tools.toString() || [].toString()}
+          value={newMaterial.tools.join(', ') || [].toString()}
         />
       </>
     );
@@ -111,7 +139,7 @@ const MaterialList = () => {
       <FlatList
         data={materials}
         renderItem={renderMaterial}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
         style={{marginTop: 20}}
       />
       <Button
@@ -120,24 +148,52 @@ const MaterialList = () => {
         onPress={() => setIsAddItemModalVisible(true)}
       />
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={isAddItemModalVisible}
         onRequestClose={() => setIsAddItemModalVisible(false)}>
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <View style={{backgroundColor: 'white', padding: 20}}>
-            <Text>Add New Material</Text>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Add New Material</Text>
             {renderInputFields()}
-            <Button title="Save" onPress={handleAddMaterial} />
-            <Button
-              title="Cancel"
-              onPress={() => setIsAddItemModalVisible(false)}
-            />
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Cancel"
+                onPress={() => setIsAddItemModalVisible(false)}
+              />
+              <Button title="Save" onPress={handleAddMaterial} />
+            </View>
           </View>
         </View>
       </Modal>
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 30,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+});
 
 export default MaterialList;

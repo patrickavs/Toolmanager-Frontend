@@ -1,7 +1,6 @@
 import axios from 'axios';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
-import ObjectID from "bson-objectid";
 
 const BASE_URL = 'http://10.0.2.2:5000';
 
@@ -17,6 +16,16 @@ const getTools = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching tools:', error);
+    throw error;
+  }
+};
+
+const getTool = async (id: string) => {
+  try {
+    const response = await api.get(`/tools/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tool:', error);
     throw error;
   }
 };
@@ -60,6 +69,16 @@ const getMaterials = async () => {
   }
 };
 
+const getMaterial = async (id: string) => {
+  try {
+    const response = await api.get(`/materials/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching material:', error);
+    throw error;
+  }
+};
+
 const addMaterial = async (material: Material) => {
   try {
     await api.post('materials', material);
@@ -89,10 +108,12 @@ const removeMaterial = async (materialId: string) => {
 
 export {
   getTools,
+  getTool,
   addTool,
   removeTool,
   updateTool,
   getMaterials,
+  getMaterial,
   addMaterial,
   updateMaterial,
   removeMaterial,
