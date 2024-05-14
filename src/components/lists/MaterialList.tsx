@@ -88,36 +88,21 @@ const MaterialList = () => {
       <>
         <TextInput
           key="name"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Name"
           onChangeText={text => handleInputChange('name', text)}
           value={newMaterial.name || ''}
         />
         <TextInput
           key="description"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Description"
           onChangeText={text => handleInputChange('description', text)}
           value={newMaterial.description || ''}
         />
         <TextInput
           key="tools"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Tools"
           onChangeText={text => handleInputChange('tools', text)}
           value={newMaterial.tools.join(', ') || [].toString()}
@@ -193,6 +178,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+  },
+  textInput: {
+    borderWidth: 1,
+    padding: 5,
+    marginVertical: 10,
+    borderRadius: 5,
   },
 });
 

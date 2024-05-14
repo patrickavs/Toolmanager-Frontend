@@ -28,35 +28,20 @@ const ListItem: React.FC<ListItemProps> = ({
       <>
         <TextInput
           key="name"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           onChangeText={text => (item.name = text)}
           value={item.name || ''}
         />
         <TextInput
           key="description"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Description"
           onChangeText={text => (item.description = text)}
           value={item.description || ''}
         />
         <TextInput
           key="materials"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Materials"
           onChangeText={text => {
             if ('materials' in item) {
@@ -78,20 +63,7 @@ const ListItem: React.FC<ListItemProps> = ({
   };
 
   return (
-    <View
-      key={item._id}
-      style={{
-        flexDirection: 'row',
-        marginBottom: 10,
-        marginHorizontal: 10,
-        backgroundColor: 'lightgray',
-        elevation: 2,
-        borderRadius: 10,
-        alignItems: 'center',
-        paddingStart: 10,
-        justifyContent: 'space-between',
-        paddingVertical: 15,
-      }}>
+    <View key={item._id} style={styles.listItemContainer}>
       <Text style={{fontSize: 15}}>{item.name}</Text>
       <View
         style={{
@@ -121,7 +93,7 @@ const ListItem: React.FC<ListItemProps> = ({
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Add New Tool</Text>
+            <Text style={styles.modalTitle}>Update Entry</Text>
             {renderInputFields()}
             <View style={styles.buttonContainer}>
               <Button title="Cancel" onPress={() => setModalVisible(false)} />
@@ -160,6 +132,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+  },
+  listItemContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    marginHorizontal: 10,
+    backgroundColor: 'lightgray',
+    elevation: 2,
+    borderRadius: 10,
+    alignItems: 'center',
+    paddingStart: 10,
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+  },
+  textInput: {
+    borderWidth: 1,
+    padding: 5,
+    marginVertical: 10,
+    borderRadius: 5,
   },
 });
 

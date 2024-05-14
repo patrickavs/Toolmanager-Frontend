@@ -13,7 +13,6 @@ import {getTools, addTool, updateTool, removeTool} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
 import ObjectID from 'bson-objectid';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const initialState: Tool = {
   _id: ObjectID().toHexString(),
@@ -84,36 +83,21 @@ const ToolList = () => {
       <>
         <TextInput
           key="name"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Name"
           onChangeText={text => handleInputChange('name', text)}
           value={newTool.name || ''}
         />
         <TextInput
           key="description"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Description"
           onChangeText={text => handleInputChange('description', text)}
           value={newTool.description || ''}
         />
         <TextInput
           key="materials"
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            marginVertical: 10,
-            borderRadius: 5,
-          }}
+          style={styles.textInput}
           placeholder="Materials"
           onChangeText={text => handleInputChange('materials', text)}
           value={newTool.materials.join(', ') || [].toString()}
@@ -189,6 +173,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+  },
+  textInput: {
+    borderWidth: 1,
+    padding: 5,
+    marginVertical: 10,
+    borderRadius: 5,
   },
 });
 
