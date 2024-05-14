@@ -18,6 +18,7 @@ import {
 import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
 import ObjectID from 'bson-objectid';
+import {CustomFAB} from '../CustomFAB.tsx';
 
 const initialState: Material = {
   _id: ObjectID().toHexString(),
@@ -125,13 +126,10 @@ const MaterialList = () => {
         data={materials}
         renderItem={renderMaterial}
         keyExtractor={item => item._id}
-        style={{marginTop: 20}}
+        style={{paddingTop: 20}}
+        ListFooterComponent={<View style={{height: 100}} />}
       />
-      <Button
-        color={'green'}
-        title="+"
-        onPress={() => setIsAddItemModalVisible(true)}
-      />
+      <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <Modal
         animationType="fade"
         transparent={true}

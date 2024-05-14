@@ -7,12 +7,14 @@ import {
   View,
   Modal,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 
 import {getTools, addTool, updateTool, removeTool} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
 import ObjectID from 'bson-objectid';
+import {CustomFAB} from '../CustomFAB.tsx';
 
 const initialState: Tool = {
   _id: ObjectID().toHexString(),
@@ -120,13 +122,10 @@ const ToolList = () => {
         data={tools}
         renderItem={renderTool}
         keyExtractor={item => item._id}
-        style={{marginTop: 20}}
+        ListFooterComponent={<View style={{height: 100}} />}
+        style={{paddingTop: 20}}
       />
-      <Button
-        color={'green'}
-        title="+"
-        onPress={() => setIsAddItemModalVisible(true)}
-      />
+      <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <Modal
         animationType="fade"
         transparent={true}
