@@ -220,7 +220,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   materialTitle: {
-    fontSize: 16,
+    fontSize: 17,
+    paddingVertical: 10,
   },
   addMaterialButtonContainer: {
     paddingHorizontal: 50,

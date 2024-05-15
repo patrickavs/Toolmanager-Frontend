@@ -1,5 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {FlatList, TextInput, View, StyleSheet} from 'react-native';
+import {
+  FlatList,
+  TextInput,
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Button,
+} from 'react-native';
 
 import {
   getMaterials,
@@ -12,6 +20,8 @@ import Material from '../Material.ts';
 import ObjectID from 'bson-objectid';
 import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
+import Ionicon from 'react-native-vector-icons/Ionicons';
+import Tool from '../Tool.ts';
 
 const initialState: Material = {
   _id: ObjectID().toHexString(),
@@ -24,6 +34,7 @@ const MaterialList = () => {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(initialState);
+  const [toolInputs, setToolInputs] = useState<Tool[]>([]);
 
   useEffect(() => {
     fetchMaterials().then(r => console.log(r));
@@ -43,6 +54,7 @@ const MaterialList = () => {
       await addMaterial(newMaterial);
       setIsAddItemModalVisible(false);
       setNewMaterial(initialState);
+      setToolInputs([]);
       await fetchMaterials();
     } catch (error) {
       console.error('Error adding material:', error);
@@ -68,13 +80,38 @@ const MaterialList = () => {
     }
   };
 
-  const handleInputChange = (name: string, value: string) => {
-    if (name === 'tools') {
-      const toolsArray = value.split(',').map(tool => tool.trim());
-      setNewMaterial({...newMaterial, [name]: toolsArray});
+  const handleInputChange = (
+    name: string,
+    value: string,
+    index: number | null = null,
+  ) => {
+    if (name === 'tools' && index !== null) {
+      const updatedTools: Tool[] = [...toolInputs];
+      updatedTools[index].name = value;
+      setToolInputs(updatedTools);
+      setNewMaterial({
+        ...newMaterial,
+        tools: updatedTools,
+      });
     } else {
       setNewMaterial({...newMaterial, [name]: value});
     }
+  };
+
+  const addToolInput = () => {
+    const newTool: Tool = {
+      _id: ObjectID().toHexString(),
+      name: '',
+      materials: [],
+      description: '',
+    };
+    setToolInputs([...toolInputs, newTool]);
+  };
+
+  const removeToolInput = (index: number) => {
+    const updatedTools = toolInputs.filter((_: Tool, i: number) => i !== index);
+    setToolInputs(updatedTools);
+    setNewMaterial({...newMaterial, tools: updatedTools});
   };
 
   const renderModalFields = () => {
@@ -94,13 +131,25 @@ const MaterialList = () => {
           onChangeText={text => handleInputChange('description', text)}
           value={newMaterial.description || ''}
         />
-        <TextInput
-          key="tools"
-          style={styles.textInput}
-          placeholder="Tools"
-          onChangeText={text => handleInputChange('tools', text)}
-          value={newMaterial.tools.join(', ') || [].toString()}
-        />
+        <Text style={styles.toolTitle}>Tools</Text>
+        {toolInputs.map((tool: Tool, index: number) => (
+          <View key={`${tool._id}`} style={styles.toolInputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Tool Name"
+              onChangeText={text => handleInputChange('tools', text, index)}
+              value={tool.name || ''}
+            />
+            <TouchableOpacity
+              style={{paddingLeft: 7}}
+              onPress={() => removeToolInput(index)}>
+              <Ionicon name="remove-circle-outline" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        ))}
+        <View style={styles.addToolButtonContainer}>
+          <Button title={'Add Tool'} onPress={addToolInput} color={'green'} />
+        </View>
       </>
     );
   };
@@ -126,7 +175,10 @@ const MaterialList = () => {
       <CustomModal
         title="Add New Material"
         fields={renderModalFields()}
-        action={() => setIsAddItemModalVisible(false)}
+        action={() => {
+          setIsAddItemModalVisible(false);
+          setToolInputs([]);
+        }}
         modalVisible={isAddItemModalVisible}
         buttonPressAction={handleAddMaterial}
         deleteAction={false}
@@ -164,6 +216,20 @@ const styles = StyleSheet.create({
     padding: 5,
     marginVertical: 10,
     borderRadius: 5,
+    flexGrow: 1,
+  },
+  toolTitle: {
+    fontSize: 17,
+    paddingVertical: 10,
+  },
+  addToolButtonContainer: {
+    paddingHorizontal: 50,
+    paddingVertical: 10,
+  },
+  toolInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
   },
 });
 
