@@ -5,14 +5,16 @@ interface CustomModalProps {
   fields: React.JSX.Element;
   action: () => void;
   modalVisible: boolean;
-  buttonAction: () => void;
+  buttonPressAction: () => void;
+  deleteAction: boolean;
 }
 
 export const CustomModal: React.FC<CustomModalProps> = ({
   fields,
   action,
   modalVisible,
-  buttonAction,
+  buttonPressAction,
+  deleteAction,
 }) => {
   return (
     <Modal
@@ -26,7 +28,11 @@ export const CustomModal: React.FC<CustomModalProps> = ({
           {fields}
           <View style={styles.buttonContainer}>
             <Button title="Cancel" onPress={() => action()} />
-            <Button title="Save" onPress={buttonAction} />
+            {deleteAction ? (
+              <Button title={'Delete'} color={'red'} />
+            ) : (
+              <Button title="Save" onPress={buttonPressAction} />
+            )}
           </View>
         </View>
       </View>

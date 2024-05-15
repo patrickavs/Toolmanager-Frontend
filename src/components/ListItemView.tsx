@@ -3,8 +3,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Button,
-  Modal,
   StyleSheet,
   TextInput,
 } from 'react-native';
@@ -65,11 +63,15 @@ const ListItem: React.FC<ListItemProps> = ({
   };
   const renderFieldsDelete = () => {
     return (
-      <>
-        <Text style={{textAlign: 'center', fontSize: 16, paddingVertical: 20}}>
-          Do you really want to delete {item.name}?
-        </Text>
-      </>
+      <Text
+        style={{
+          textAlign: 'center',
+          fontSize: 16,
+          paddingVertical: 20,
+          fontWeight: 'bold',
+        }}>
+        Are you sure to delete {item.name}?
+      </Text>
     );
   };
 
@@ -101,13 +103,15 @@ const ListItem: React.FC<ListItemProps> = ({
         fields={renderInputFieldsUpdate()}
         action={() => setModalVisible(false)}
         modalVisible={modalVisible}
-        buttonAction={() => onUpdateItem(item._id, {name: 'Updated Item'})}
+        buttonPressAction={() => onUpdateItem(item._id, {name: 'Updated Item'})}
+        deleteAction={false}
       />
       <CustomModal
         fields={renderFieldsDelete()}
         action={() => setDeleteModalVisible(false)}
         modalVisible={deleteModalVisible}
-        buttonAction={() => onDeleteItem(item._id)}
+        buttonPressAction={() => onDeleteItem(item._id)}
+        deleteAction={true}
       />
     </View>
   );

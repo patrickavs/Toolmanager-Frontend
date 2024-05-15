@@ -1,13 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  Button,
-  FlatList,
-  Text,
-  TextInput,
-  View,
-  Modal,
-  StyleSheet,
-} from 'react-native';
+import {FlatList, TextInput, View, StyleSheet} from 'react-native';
 
 import {
   getMaterials,
@@ -19,7 +11,7 @@ import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
 import ObjectID from 'bson-objectid';
 import {CustomFAB} from '../CustomFAB.tsx';
-import { CustomModal } from "../CustomModal.tsx";
+import {CustomModal} from '../CustomModal.tsx';
 
 const initialState: Material = {
   _id: ObjectID().toHexString(),
@@ -135,7 +127,8 @@ const MaterialList = () => {
         fields={renderInputFields()}
         action={() => setIsAddItemModalVisible(false)}
         modalVisible={isAddItemModalVisible}
-        buttonAction={handleAddMaterial}
+        buttonPressAction={handleAddMaterial}
+        deleteAction={false}
       />
     </>
   );

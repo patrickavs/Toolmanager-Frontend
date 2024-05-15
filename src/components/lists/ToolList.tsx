@@ -1,14 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  Button,
-  FlatList,
-  Text,
-  TextInput,
-  View,
-  Modal,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {FlatList, TextInput, View, StyleSheet} from 'react-native';
 
 import {getTools, addTool, updateTool, removeTool} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
@@ -123,15 +114,16 @@ const ToolList = () => {
         data={tools}
         renderItem={renderTool}
         keyExtractor={item => item._id}
-        ListFooterComponent={<View style={{height: 100}} />}
         style={{paddingTop: 20}}
+        ListFooterComponent={<View style={{height: 100}} />}
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <CustomModal
         fields={renderInputFields()}
         action={() => setIsAddItemModalVisible(false)}
         modalVisible={isAddItemModalVisible}
-        buttonAction={handleAddTool}
+        buttonPressAction={handleAddTool}
+        deleteAction={false}
       />
     </>
   );
