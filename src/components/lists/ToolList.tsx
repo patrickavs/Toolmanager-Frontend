@@ -15,6 +15,7 @@ import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
 import ObjectID from 'bson-objectid';
 import {CustomFAB} from '../CustomFAB.tsx';
+import {CustomModal} from '../CustomModal.tsx';
 
 const initialState: Tool = {
   _id: ObjectID().toHexString(),
@@ -126,25 +127,12 @@ const ToolList = () => {
         style={{paddingTop: 20}}
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isAddItemModalVisible}
-        onRequestClose={() => setIsAddItemModalVisible(false)}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Add New Tool</Text>
-            {renderInputFields()}
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Cancel"
-                onPress={() => setIsAddItemModalVisible(false)}
-              />
-              <Button title="Save" onPress={handleAddTool} />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <CustomModal
+        fields={renderInputFields()}
+        action={() => setIsAddItemModalVisible(false)}
+        modalVisible={isAddItemModalVisible}
+        buttonAction={handleAddTool}
+      />
     </>
   );
 };

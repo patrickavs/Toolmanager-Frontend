@@ -1,12 +1,19 @@
 import {Button, Modal, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
-export const CustomModal = (
-  fields: React.JSX.Element,
-  action: () => void,
-  modalVisible: boolean,
-  buttonAction: () => void,
-) => {
+interface CustomModalProps {
+  fields: React.JSX.Element;
+  action: () => void;
+  modalVisible: boolean;
+  buttonAction: () => void;
+}
+
+export const CustomModal: React.FC<CustomModalProps> = ({
+  fields,
+  action,
+  modalVisible,
+  buttonAction,
+}) => {
   return (
     <Modal
       animationType="fade"

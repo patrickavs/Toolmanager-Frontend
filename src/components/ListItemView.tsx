@@ -9,6 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {CustomModal} from './CustomModal.tsx';
 
 interface ListItemProps {
   item: any;
@@ -22,8 +23,9 @@ const ListItem: React.FC<ListItemProps> = ({
   onUpdateItem,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  const renderInputFields = () => {
+  const renderInputFieldsUpdate = () => {
     return (
       <>
         <TextInput
@@ -61,6 +63,15 @@ const ListItem: React.FC<ListItemProps> = ({
       </>
     );
   };
+  const renderFieldsDelete = () => {
+    return (
+      <>
+        <Text style={{textAlign: 'center', fontSize: 16, paddingVertical: 20}}>
+          Do you really want to delete {item.name}?
+        </Text>
+      </>
+    );
+  };
 
   return (
     <View key={item._id} style={styles.listItemContainer}>
@@ -77,7 +88,7 @@ const ListItem: React.FC<ListItemProps> = ({
             style={{marginRight: 15}}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => onDeleteItem(item._id)}>
+        <TouchableOpacity onPress={() => setDeleteModalVisible(true)}>
           <Ionicons
             name="trash-outline"
             size={24}
@@ -86,25 +97,18 @@ const ListItem: React.FC<ListItemProps> = ({
           />
         </TouchableOpacity>
       </View>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Update Entry</Text>
-            {renderInputFields()}
-            <View style={styles.buttonContainer}>
-              <Button title="Cancel" onPress={() => setModalVisible(false)} />
-              <Button
-                title="Save"
-                onPress={() => onUpdateItem(item._id, {name: 'Updated Item'})}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <CustomModal
+        fields={renderInputFieldsUpdate()}
+        action={() => setModalVisible(false)}
+        modalVisible={modalVisible}
+        buttonAction={() => onUpdateItem(item._id, {name: 'Updated Item'})}
+      />
+      <CustomModal
+        fields={renderFieldsDelete()}
+        action={() => setDeleteModalVisible(false)}
+        modalVisible={deleteModalVisible}
+        buttonAction={() => onDeleteItem(item._id)}
+      />
     </View>
   );
 };

@@ -19,6 +19,7 @@ import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
 import ObjectID from 'bson-objectid';
 import {CustomFAB} from '../CustomFAB.tsx';
+import { CustomModal } from "../CustomModal.tsx";
 
 const initialState: Material = {
   _id: ObjectID().toHexString(),
@@ -130,25 +131,12 @@ const MaterialList = () => {
         ListFooterComponent={<View style={{height: 100}} />}
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isAddItemModalVisible}
-        onRequestClose={() => setIsAddItemModalVisible(false)}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Add New Material</Text>
-            {renderInputFields()}
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Cancel"
-                onPress={() => setIsAddItemModalVisible(false)}
-              />
-              <Button title="Save" onPress={handleAddMaterial} />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <CustomModal
+        fields={renderInputFields()}
+        action={() => setIsAddItemModalVisible(false)}
+        modalVisible={isAddItemModalVisible}
+        buttonAction={handleAddMaterial}
+      />
     </>
   );
 };
