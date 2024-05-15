@@ -94,6 +94,7 @@ const ListItem: React.FC<ListItemProps> = ({
         </TouchableOpacity>
       </View>
       <CustomModal
+        title={'Update Entry'}
         fields={renderInputFieldsUpdate()}
         action={() => setModalVisible(false)}
         modalVisible={modalVisible}
@@ -101,6 +102,7 @@ const ListItem: React.FC<ListItemProps> = ({
         deleteAction={false}
       />
       <CustomModal
+        title={'Warning'}
         fields={renderFieldsDelete()}
         action={() => setDeleteModalVisible(false)}
         modalVisible={deleteModalVisible}

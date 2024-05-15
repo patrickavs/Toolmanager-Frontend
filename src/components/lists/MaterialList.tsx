@@ -124,6 +124,7 @@ const MaterialList = () => {
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <CustomModal
+        title="Add New Material"
         fields={renderModalFields()}
         action={() => setIsAddItemModalVisible(false)}
         modalVisible={isAddItemModalVisible}

@@ -2,6 +2,7 @@ import {Button, Modal, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
 interface CustomModalProps {
+  title: string;
   fields: React.JSX.Element;
   action: () => void;
   modalVisible: boolean;
@@ -10,6 +11,7 @@ interface CustomModalProps {
 }
 
 export const CustomModal: React.FC<CustomModalProps> = ({
+  title = 'New Title',
   fields,
   action,
   modalVisible,
@@ -24,7 +26,7 @@ export const CustomModal: React.FC<CustomModalProps> = ({
       onRequestClose={() => action()}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Add New Tool</Text>
+          <Text style={styles.modalTitle}>{title}</Text>
           {fields}
           <View style={styles.buttonContainer}>
             <Button title="Cancel" onPress={() => action()} />

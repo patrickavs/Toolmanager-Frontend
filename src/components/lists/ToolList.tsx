@@ -174,6 +174,7 @@ const ToolList = () => {
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <CustomModal
+        title={'Add New Tool'}
         fields={renderModalFields()}
         action={() => {
           setIsAddItemModalVisible(false);
