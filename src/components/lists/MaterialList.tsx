@@ -77,7 +77,7 @@ const MaterialList = () => {
     }
   };
 
-  const renderInputFields = () => {
+  const renderModalFields = () => {
     return (
       <>
         <TextInput
@@ -124,7 +124,7 @@ const MaterialList = () => {
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <CustomModal
-        fields={renderInputFields()}
+        fields={renderModalFields()}
         action={() => setIsAddItemModalVisible(false)}
         modalVisible={isAddItemModalVisible}
         buttonPressAction={handleAddMaterial}

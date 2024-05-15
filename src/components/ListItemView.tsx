@@ -63,13 +63,7 @@ const ListItem: React.FC<ListItemProps> = ({
   };
   const renderFieldsDelete = () => {
     return (
-      <Text
-        style={{
-          textAlign: 'center',
-          fontSize: 16,
-          paddingVertical: 20,
-          fontWeight: 'bold',
-        }}>
+      <Text style={styles.deleteFieldText}>
         Are you sure to delete {item.name}?
       </Text>
     );
@@ -158,6 +152,12 @@ const styles = StyleSheet.create({
     padding: 5,
     marginVertical: 10,
     borderRadius: 5,
+  },
+  deleteFieldText: {
+    textAlign: 'center',
+    fontSize: 16,
+    paddingVertical: 20,
+    fontWeight: 'bold',
   },
 });
 
