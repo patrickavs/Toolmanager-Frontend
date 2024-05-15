@@ -29,7 +29,11 @@ export const CustomModal: React.FC<CustomModalProps> = ({
           <View style={styles.buttonContainer}>
             <Button title="Cancel" onPress={() => action()} />
             {deleteAction ? (
-              <Button title={'Delete'} color={'red'} />
+              <Button
+                title={'Delete'}
+                color={'red'}
+                onPress={buttonPressAction}
+              />
             ) : (
               <Button title="Save" onPress={buttonPressAction} />
             )}
