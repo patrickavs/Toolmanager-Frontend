@@ -13,30 +13,34 @@ interface ListItemProps {
   item: any;
   onDeleteItem: (id: string) => void;
   onUpdateItem: (id: string, data: Partial<any>) => void;
+  itemInput: Array<any>;
 }
 
 const ListItem: React.FC<ListItemProps> = ({
   item,
   onDeleteItem,
   onUpdateItem,
+  itemInput,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [newItem, setNewItem] = useState({});
 
+  // TODO: Adjust materials/items input for Tool/Material
   const renderInputFieldsUpdate = () => {
     return (
       <>
         <TextInput
           key="name"
           style={styles.textInput}
-          onChangeText={text => (item.name = text)}
+          onChangeText={text => setNewItem({...newItem, name: text})}
           value={item.name || ''}
         />
         <TextInput
           key="description"
           style={styles.textInput}
           placeholder="Description"
-          onChangeText={text => (item.description = text)}
+          onChangeText={text => setNewItem({...newItem, description: text})}
           value={item.description || ''}
         />
         <TextInput
@@ -69,6 +73,12 @@ const ListItem: React.FC<ListItemProps> = ({
     );
   };
 
+  const handleUpdateItem = () => {
+    const updatedItem = {...item, ...newItem};
+    onUpdateItem(item._id, updatedItem);
+    setModalVisible(false);
+  };
+
   return (
     <View key={item._id} style={styles.listItemContainer}>
       <Text style={{fontSize: 15}}>{item.name}</Text>
@@ -98,7 +108,7 @@ const ListItem: React.FC<ListItemProps> = ({
         fields={renderInputFieldsUpdate()}
         action={() => setModalVisible(false)}
         modalVisible={modalVisible}
-        buttonPressAction={() => onUpdateItem(item._id, {name: 'Updated Item'})}
+        buttonPressAction={() => handleUpdateItem()}
         deleteAction={false}
       />
       <CustomModal
