@@ -5,9 +5,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  Button,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {CustomModal} from './CustomModal.tsx';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 interface ListItemProps {
   item: any;
@@ -25,9 +27,31 @@ const ListItem: React.FC<ListItemProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [newItem, setNewItem] = useState({});
+  const [inputs, setInputs] = useState<any>([]);
+
+  if ('materials' in item) {
+  }
+
+  const handleInputChange = (
+    name: string,
+    value: string,
+    index: number | null = null,
+  ) => {
+    if (name === 'materials' && index !== null) {
+      const updatedMaterials: any[] = [...inputs];
+      updatedMaterials[index].name = value;
+      setInputs(updatedMaterials);
+      setNewItem({
+        ...newItem,
+        materials: updatedMaterials,
+      });
+    } else {
+      setNewItem({...newItem, [name]: value});
+    }
+  };
 
   // TODO: Adjust materials/items input for Tool/Material
-  const renderInputFieldsUpdate = () => {
+  const renderFieldsUpdate = () => {
     return (
       <>
         <TextInput
@@ -43,25 +67,29 @@ const ListItem: React.FC<ListItemProps> = ({
           onChangeText={text => setNewItem({...newItem, description: text})}
           value={item.description || ''}
         />
-        <TextInput
-          key="materials"
-          style={styles.textInput}
-          placeholder="Materials"
-          onChangeText={text => {
-            if ('materials' in item) {
-              item.materials = text;
-            } else if ('tools' in item) {
-              item.tools = text;
-            }
-          }}
-          value={
-            'materials' in item
-              ? item.materials.join(', ') || ''
-              : 'tools' in item
-              ? item.tools.join(', ') || ''
-              : ''
-          }
-        />
+        <Text style={styles.itemTitle}>Materials</Text>
+        {itemInput.map((mapItem: any, index: number) => (
+          <View key={`${mapItem._id}`} style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Material Name"
+              onChangeText={text => handleInputChange('materials', text, index)}
+              value={mapItem.name || ''}
+            />
+            <TouchableOpacity
+              style={{paddingLeft: 7}}
+              onPress={() => removeMaterialInput(index)}>
+              <Ionicon name="remove-circle-outline" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        ))}
+        <View style={styles.addItemButtonContainer}>
+          <Button
+            title={'Add Material'}
+            onPress={addItemInput}
+            color={'green'}
+          />
+        </View>
       </>
     );
   };
@@ -105,7 +133,7 @@ const ListItem: React.FC<ListItemProps> = ({
       </View>
       <CustomModal
         title={'Update Entry'}
-        fields={renderInputFieldsUpdate()}
+        fields={renderFieldsUpdate()}
         action={() => setModalVisible(false)}
         modalVisible={modalVisible}
         buttonPressAction={() => handleUpdateItem()}
@@ -170,6 +198,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 20,
     fontWeight: 'bold',
+  },
+  itemTitle: {
+    fontSize: 17,
+    paddingVertical: 10,
+  },
+  addItemButtonContainer: {
+    paddingHorizontal: 50,
+    paddingVertical: 10,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
   },
 });
 
