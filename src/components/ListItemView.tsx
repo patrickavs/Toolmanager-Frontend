@@ -16,6 +16,7 @@ interface ListItemProps {
   onDeleteItem: (id: string) => void;
   onUpdateItem: (id: string, data: Partial<any>) => void;
   itemInput: Array<any>;
+  onClick: () => void;
 }
 
 const ListItem: React.FC<ListItemProps> = ({
@@ -23,6 +24,7 @@ const ListItem: React.FC<ListItemProps> = ({
   onDeleteItem,
   onUpdateItem,
   itemInput,
+  onClick,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -108,46 +110,52 @@ const ListItem: React.FC<ListItemProps> = ({
   };
 
   return (
-    <View key={item._id} style={styles.listItemContainer}>
-      <Text style={{fontSize: 15}}>{item.name}</Text>
-      <View
-        style={{
-          flexDirection: 'row',
-        }}>
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Ionicons
-            name="pencil-outline"
-            size={24}
-            color="blue"
-            style={{marginRight: 15}}
+    <>
+      <TouchableOpacity onPress={onClick}>
+        <View key={item._id} style={styles.listItemContainer}>
+          <Text style={{fontSize: 15}}>{item.name}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Ionicons
+                name="pencil-outline"
+                size={24}
+                color="blue"
+                style={{marginRight: 15}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setDeleteModalVisible(true)}>
+              <Ionicons
+                name="trash-outline"
+                size={24}
+                color="red"
+                style={{marginRight: 15}}
+              />
+            </TouchableOpacity>
+          </View>
+          <CustomModal
+            title={'Update Entry'}
+            fields={renderFieldsUpdate()}
+            action={() => setModalVisible(false)}
+            modalVisible={modalVisible}
+            buttonPressAction={() =>
+              onUpdateItem(item._id, {name: 'Updated Item'})
+            }
+            deleteAction={false}
           />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setDeleteModalVisible(true)}>
-          <Ionicons
-            name="trash-outline"
-            size={24}
-            color="red"
-            style={{marginRight: 15}}
+          <CustomModal
+            title={'Warning'}
+            fields={renderFieldsDelete()}
+            action={() => setDeleteModalVisible(false)}
+            modalVisible={deleteModalVisible}
+            buttonPressAction={() => onDeleteItem(item._id)}
+            deleteAction={true}
           />
-        </TouchableOpacity>
-      </View>
-      <CustomModal
-        title={'Update Entry'}
-        fields={renderFieldsUpdate()}
-        action={() => setModalVisible(false)}
-        modalVisible={modalVisible}
-        buttonPressAction={() => handleUpdateItem()}
-        deleteAction={false}
-      />
-      <CustomModal
-        title={'Warning'}
-        fields={renderFieldsDelete()}
-        action={() => setDeleteModalVisible(false)}
-        modalVisible={deleteModalVisible}
-        buttonPressAction={() => onDeleteItem(item._id)}
-        deleteAction={true}
-      />
-    </View>
+        </View>
+      </TouchableOpacity>
+    </>
   );
 };
 
