@@ -10,6 +10,9 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {CustomModal} from './CustomModal.tsx';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import Material from './Material.ts';
+import ObjectID from 'bson-objectid';
+import Tool from './Tool.ts';
 
 interface ListItemProps {
   item: any;
@@ -31,9 +34,6 @@ const ListItem: React.FC<ListItemProps> = ({
   const [newItem, setNewItem] = useState({});
   const [inputs, setInputs] = useState<any>([]);
 
-  if ('materials' in item) {
-  }
-
   const handleInputChange = (
     name: string,
     value: string,
@@ -47,12 +47,41 @@ const ListItem: React.FC<ListItemProps> = ({
         ...newItem,
         materials: updatedMaterials,
       });
-    } else {
-      setNewItem({...newItem, [name]: value});
+    } else if (name === 'tools' && index !== null) {
+      const updatedTools: any[] = [...inputs];
+      updatedTools[index].name = value;
+      setInputs(updatedTools);
+      setNewItem({...newItem, tools: updatedTools});
     }
   };
 
-  // TODO: Adjust materials/items input for Tool/Material
+  const removeItemInput = (index: number) => {
+    const updatedMaterials = inputs.filter(
+      (_: Material, i: number) => i !== index,
+    );
+    setInputs(updatedMaterials);
+    setNewItem({...newItem, materials: updatedMaterials});
+  };
+
+  const addItemInput = () => {
+    if ('materials' in item) {
+      const newMaterial: Material = {
+        _id: ObjectID().toHexString(),
+        name: '',
+        tools: [],
+        description: '',
+      };
+      setInputs([...inputs, newMaterial]);
+    } else if ('tools' in item) {
+      const newTool: Tool = {
+        _id: ObjectID().toHexString(),
+        name: '',
+        materials: [],
+        description: '',
+      };
+      setInputs([...inputs, newTool]);
+    }
+  };
   const renderFieldsUpdate = () => {
     return (
       <>
@@ -69,7 +98,19 @@ const ListItem: React.FC<ListItemProps> = ({
           onChangeText={text => setNewItem({...newItem, description: text})}
           value={item.description || ''}
         />
-        <Text style={styles.itemTitle}>Materials</Text>
+        {'materials' in item ? (
+          <Text style={styles.itemTitle}>Materials</Text>
+        ) : (
+          <Text style={styles.itemTitle}>Tools</Text>
+        )}
+        {item.materials &&
+          item.materials.map((material: Material, index: number) => (
+            <Text key={index}>{material.name}</Text>
+          ))}
+        {item.tools &&
+          item.tools.map((tool: Tool, index: number) => (
+            <Text key={index}>{tool.name}</Text>
+          ))}
         {itemInput.map((mapItem: any, index: number) => (
           <View key={`${mapItem._id}`} style={styles.inputContainer}>
             <TextInput
@@ -80,14 +121,14 @@ const ListItem: React.FC<ListItemProps> = ({
             />
             <TouchableOpacity
               style={{paddingLeft: 7}}
-              onPress={() => removeMaterialInput(index)}>
+              onPress={() => removeItemInput(index)}>
               <Ionicon name="remove-circle-outline" size={24} color="red" />
             </TouchableOpacity>
           </View>
         ))}
         <View style={styles.addItemButtonContainer}>
           <Button
-            title={'Add Material'}
+            title={'materials' in item ? 'Add Material' : 'Add Tool'}
             onPress={addItemInput}
             color={'green'}
           />
@@ -140,9 +181,7 @@ const ListItem: React.FC<ListItemProps> = ({
             fields={renderFieldsUpdate()}
             action={() => setModalVisible(false)}
             modalVisible={modalVisible}
-            buttonPressAction={() =>
-              onUpdateItem(item._id, {name: 'Updated Item'})
-            }
+            buttonPressAction={() => handleUpdateItem()}
             deleteAction={false}
           />
           <CustomModal

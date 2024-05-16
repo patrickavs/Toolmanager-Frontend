@@ -88,7 +88,7 @@ const MaterialList = () => {
     value: string,
     index: number | null = null,
   ) => {
-    if (name === 'tools' && index !== null) {
+    if (index !== null) {
       const updatedTools: Tool[] = [...toolInputs];
       updatedTools[index].name = value;
       setToolInputs(updatedTools);
@@ -96,8 +96,6 @@ const MaterialList = () => {
         ...newMaterial,
         tools: updatedTools,
       });
-    } else {
-      setNewMaterial({...newMaterial, [name]: value});
     }
   };
 
@@ -162,6 +160,7 @@ const MaterialList = () => {
       item={item}
       onDeleteItem={handleDeleteMaterial}
       onUpdateItem={handleUpdateMaterial}
+      itemInput={toolInputs}
       onClick={() =>
         navigation.navigate('DetailView', {item: item, itemType: 'Material'})
       }
