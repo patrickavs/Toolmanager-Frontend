@@ -1,17 +1,33 @@
+import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import React from 'react';
 import ToolList from './components/lists/ToolList.tsx';
 import MaterialList from './components/lists/MaterialList.tsx';
-import { bluetooth } from "ionicons/icons";
+import DetailView from './components/DetailView.tsx'; // Adjust the import as needed
 
-function ToolScreen() {
-  return <ToolList />;
+const ToolStack = createNativeStackNavigator();
+const MaterialStack = createNativeStackNavigator();
+
+function ToolStackScreen() {
+  return (
+    <ToolStack.Navigator
+      screenOptions={{headerStyle: {backgroundColor: 'orange'}}}>
+      <ToolStack.Screen name="Tools" component={ToolList} />
+      <ToolStack.Screen name="DetailView" component={DetailView} />
+    </ToolStack.Navigator>
+  );
 }
 
-function MaterialScreen() {
-  return <MaterialList />;
+function MaterialStackScreen() {
+  return (
+    <MaterialStack.Navigator
+      screenOptions={{headerStyle: {backgroundColor: 'orange'}}}>
+      <MaterialStack.Screen name="Materials" component={MaterialList} />
+      <MaterialStack.Screen name="DetailView" component={DetailView} />
+    </MaterialStack.Navigator>
+  );
 }
 
 const Tab = createBottomTabNavigator();
@@ -22,21 +38,22 @@ const App: React.FC = () => {
       <Tab.Navigator
         screenOptions={({route}) => ({
           tabBarIcon: ({color, focused}) =>
-            route.name === 'Tools' ? (
+            route.name === 'ToolStack' ? (
               focused ? (
-                <Ionicons name={'hammer'} color={color} size={30} />
+                <Ionicons name="hammer" color={color} size={30} />
               ) : (
-                <Ionicons name={'hammer-outline'} color={color} size={30} />
+                <Ionicons name="hammer-outline" color={color} size={30} />
               )
             ) : focused ? (
-              <Ionicons name={'construct'} color={color} size={30} />
+              <Ionicons name="construct" color={color} size={30} />
             ) : (
-              <Ionicons name={'construct-outline'} color={color} size={30} />
+              <Ionicons name="construct-outline" color={color} size={30} />
             ),
-          headerStyle: {backgroundColor: 'orange'},
+          headerShown: false,
+          tabBarShowLabel: false,
         })}>
-        <Tab.Screen name="Tools" component={ToolScreen} />
-        <Tab.Screen name="Materials" component={MaterialScreen} />
+        <Tab.Screen name="ToolStack" component={ToolStackScreen} />
+        <Tab.Screen name="MaterialStack" component={MaterialStackScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

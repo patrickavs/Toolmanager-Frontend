@@ -22,6 +22,7 @@ import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Tool from '../Tool.ts';
+import {useNavigation} from '@react-navigation/native';
 
 const initialState: Material = {
   _id: ObjectID().toHexString(),
@@ -31,6 +32,8 @@ const initialState: Material = {
 };
 
 const MaterialList = () => {
+  const navigation = useNavigation();
+
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(initialState);
@@ -159,6 +162,9 @@ const MaterialList = () => {
       item={item}
       onDeleteItem={handleDeleteMaterial}
       onUpdateItem={handleUpdateMaterial}
+      onClick={() =>
+        navigation.navigate('DetailView', {item: item, itemType: 'Material'})
+      }
     />
   );
 

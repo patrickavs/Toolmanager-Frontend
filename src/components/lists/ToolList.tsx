@@ -17,6 +17,7 @@ import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
 import Material from '../Material.ts';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 const initialState: Tool = {
   _id: ObjectID().toHexString(),
@@ -26,6 +27,8 @@ const initialState: Tool = {
 };
 
 const ToolList = () => {
+  const navigation = useNavigation();
+
   const [tools, setTools] = useState<Tool[]>([]);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newTool, setNewTool] = useState<Tool>(initialState);
@@ -160,6 +163,9 @@ const ToolList = () => {
       item={item}
       onDeleteItem={handleDeleteTool}
       onUpdateItem={handleUpdateTool}
+      onClick={() =>
+        navigation.navigate('DetailView', {item: item, itemType: 'Tool'})
+      }
     />
   );
 
