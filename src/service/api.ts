@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
+import User from '../components/User.ts';
 
 const BASE_URL = 'http://10.0.2.2:5000';
 
@@ -106,6 +107,55 @@ const removeMaterial = async (materialId: string) => {
   }
 };
 
+// User
+
+const getUsers = async () => {
+  try {
+    const response = await api.get('/users');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+};
+
+const getUser = async (id: string) => {
+  try {
+    const response = await api.get(`/users/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+};
+
+const addUser = async (user: User) => {
+  try {
+    await api.post('users', user);
+  } catch (error) {
+    console.error('Error adding user:', error);
+    throw error;
+  }
+};
+
+const updateUser = async (userId: string, data: {}) => {
+  try {
+    await api.put(`users/${userId}`, data);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};
+
+const removeUser = async (userId: string) => {
+  try {
+    await api.delete(`users/${userId}`);
+  } catch (error) {
+    console.error('Error removing user:', error);
+    throw error;
+  }
+};
+
 export {
   getTools,
   getTool,
@@ -117,4 +167,9 @@ export {
   addMaterial,
   updateMaterial,
   removeMaterial,
+  getUsers,
+  getUser,
+  addUser,
+  updateUser,
+  removeUser,
 };
