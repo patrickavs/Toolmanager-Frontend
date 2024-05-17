@@ -2,6 +2,7 @@ import axios from 'axios';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
 import User from '../components/User.ts';
+import * as Keychain from 'react-native-keychain';
 
 const BASE_URL = 'http://10.0.2.2:5000';
 
@@ -156,6 +157,35 @@ const removeUser = async (userId: string) => {
   }
 };
 
+// Authentication
+
+api.interceptors.request.use(async config => {
+  const token = await Keychain.getGenericPassword();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token.password}`;
+  }
+  return config;
+});
+
+const login = async (email: string, password: string) => {
+  try {
+    const response = await api.post('/api/login', {email, password});
+    return response.data.token;
+  } catch (error) {
+    console.error('Login fail:', error);
+    throw error;
+  }
+};
+
+const register = async (name: string, email: string, password: string) => {
+  try {
+    await api.post('/api/register', {name, email, password});
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+};
+
 export {
   getTools,
   getTool,
@@ -172,4 +202,6 @@ export {
   addUser,
   updateUser,
   removeUser,
+  login,
+  register,
 };

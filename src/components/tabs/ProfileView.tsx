@@ -3,19 +3,41 @@ import {StyleSheet, View, ScrollView} from 'react-native';
 import {Avatar, Text, Button} from 'react-native-elements';
 import {useNavigation} from '@react-navigation/native';
 import User from '../User.ts';
+import * as Keychain from 'react-native-keychain';
 
 const ProfileView = (user: User) => {
   const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    try {
+      const credentials = await Keychain.getGenericPassword();
+      if (credentials) {
+        const token = credentials.password;
+        await api.post('/api/logout', null, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        await Keychain.resetGenericPassword();
+        navigation.navigate('AuthStackScreen');
+      }
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <Avatar
-          rounded
-          size="xlarge"
-          source={{
-            uri: user.profilePic,
-          }}
-        />
+        {user ? (
+          <Avatar
+            rounded
+            size="xlarge"
+            source={{
+              uri: user.profilePic,
+            }}
+          />
+        ) : null}
         <Text h4 style={styles.name}>
           {user.name}
         </Text>
@@ -32,6 +54,7 @@ const ProfileView = (user: User) => {
         </Text>
         <Text style={styles.sectionContent}>{user.aboutMe}</Text>
       </View>
+      <Button title="Logout" onPress={handleLogout} />
     </ScrollView>
   );
 };
