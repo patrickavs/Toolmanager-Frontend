@@ -96,6 +96,8 @@ const MaterialList = () => {
         ...newMaterial,
         tools: updatedTools,
       });
+    } else {
+      setNewMaterial({...newMaterial, [name]: value});
     }
   };
 
@@ -160,7 +162,6 @@ const MaterialList = () => {
       item={item}
       onDeleteItem={handleDeleteMaterial}
       onUpdateItem={handleUpdateMaterial}
-      itemInput={toolInputs}
       onClick={() =>
         navigation.navigate('DetailView', {item: item, itemType: 'Material'})
       }

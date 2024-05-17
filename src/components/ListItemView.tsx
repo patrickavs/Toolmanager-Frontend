@@ -18,7 +18,6 @@ interface ListItemProps {
   item: any;
   onDeleteItem: (id: string) => void;
   onUpdateItem: (id: string, data: Partial<any>) => void;
-  itemInput: Array<any>;
   onClick: () => void;
 }
 
@@ -26,13 +25,28 @@ const ListItem: React.FC<ListItemProps> = ({
   item,
   onDeleteItem,
   onUpdateItem,
-  itemInput,
   onClick,
 }) => {
+  let initialState = {};
+  if ('materials' in item) {
+    initialState = {
+      _id: item._id,
+      name: '',
+      description: '',
+      materials: [],
+    };
+  } else {
+    initialState = {
+      _id: item._id,
+      name: '',
+      description: '',
+      tools: [],
+    };
+  }
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [newItem, setNewItem] = useState({});
-  const [inputs, setInputs] = useState<any>([]);
+  const [newItem, setNewItem] = useState<any>(initialState);
+  const [inputs, setInputs] = useState<any[]>([]);
 
   const handleInputChange = (
     name: string,
@@ -40,7 +54,7 @@ const ListItem: React.FC<ListItemProps> = ({
     index: number | null = null,
   ) => {
     if (name === 'materials' && index !== null) {
-      const updatedMaterials: any[] = [...inputs];
+      const updatedMaterials: Material[] = [...inputs];
       updatedMaterials[index].name = value;
       setInputs(updatedMaterials);
       setNewItem({
@@ -48,17 +62,17 @@ const ListItem: React.FC<ListItemProps> = ({
         materials: updatedMaterials,
       });
     } else if (name === 'tools' && index !== null) {
-      const updatedTools: any[] = [...inputs];
+      const updatedTools: Tool[] = [...inputs];
       updatedTools[index].name = value;
       setInputs(updatedTools);
       setNewItem({...newItem, tools: updatedTools});
+    } else {
+      setNewItem({...newItem, [name]: value});
     }
   };
 
   const removeItemInput = (index: number) => {
-    const updatedMaterials = inputs.filter(
-      (_: Material, i: number) => i !== index,
-    );
+    const updatedMaterials = inputs.filter((_: any, i: number) => i !== index);
     setInputs(updatedMaterials);
     setNewItem({...newItem, materials: updatedMaterials});
   };
@@ -72,7 +86,7 @@ const ListItem: React.FC<ListItemProps> = ({
         description: '',
       };
       setInputs([...inputs, newMaterial]);
-    } else if ('tools' in item) {
+    } else {
       const newTool: Tool = {
         _id: ObjectID().toHexString(),
         name: '',
@@ -88,14 +102,15 @@ const ListItem: React.FC<ListItemProps> = ({
         <TextInput
           key="name"
           style={styles.textInput}
-          onChangeText={text => setNewItem({...newItem, name: text})}
+          placeholder="Name"
+          onChangeText={text => handleInputChange('name', text)}
           value={item.name || ''}
         />
         <TextInput
           key="description"
           style={styles.textInput}
           placeholder="Description"
-          onChangeText={text => setNewItem({...newItem, description: text})}
+          onChangeText={text => handleInputChange('description', text)}
           value={item.description || ''}
         />
         {'materials' in item ? (
@@ -111,12 +126,18 @@ const ListItem: React.FC<ListItemProps> = ({
           item.tools.map((tool: Tool, index: number) => (
             <Text key={index}>{tool.name}</Text>
           ))}
-        {itemInput.map((mapItem: any, index: number) => (
+        {inputs.map((mapItem: any, index: number) => (
           <View key={`${mapItem._id}`} style={styles.inputContainer}>
             <TextInput
               style={styles.textInput}
-              placeholder="Material Name"
-              onChangeText={text => handleInputChange('materials', text, index)}
+              placeholder={'materials' in item ? 'Material Name' : 'Tool Name'}
+              onChangeText={text => {
+                if ('materials' in item) {
+                  handleInputChange('materials', text, index);
+                } else {
+                  handleInputChange('tools', text, index);
+                }
+              }}
               value={mapItem.name || ''}
             />
             <TouchableOpacity
@@ -235,6 +256,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   textInput: {
+    flexGrow: 1,
     borderWidth: 1,
     padding: 5,
     marginVertical: 10,

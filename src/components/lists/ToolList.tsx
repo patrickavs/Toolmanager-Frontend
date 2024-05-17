@@ -69,9 +69,9 @@ const ToolList = () => {
     }
   };
 
-  const handleUpdateTool = async (id: string) => {
+  const handleUpdateTool = async (id: string, data: {}) => {
     try {
-      await updateTool(id, newTool);
+      await updateTool(id, data);
       await fetchTools();
     } catch (error) {
       console.error('Error updating tool:', error);
@@ -91,6 +91,8 @@ const ToolList = () => {
         ...newTool,
         materials: updatedMaterials,
       });
+    } else {
+      setNewTool({...newTool, [name]: value});
     }
   };
 
@@ -161,7 +163,6 @@ const ToolList = () => {
       item={item}
       onDeleteItem={handleDeleteTool}
       onUpdateItem={handleUpdateTool}
-      itemInput={materialInputs}
       onClick={() =>
         navigation.navigate('DetailView', {item: item, itemType: 'Tool'})
       }
