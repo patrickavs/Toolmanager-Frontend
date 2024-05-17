@@ -159,12 +159,16 @@ const MaterialList = () => {
 
   const renderMaterial = ({item}: {item: Material}) => (
     <ListItem
+      key={item._id}
       item={item}
       onDeleteItem={handleDeleteMaterial}
-      onUpdateItem={handleUpdateMaterial}
-      onClick={() =>
-        navigation.navigate('DetailView', {item: item, itemType: 'Material'})
-      }
+      onClick={() => {
+        navigation.navigate('DetailView', {
+          item: item,
+          itemType: 'Material',
+          onUpdateItem: handleUpdateMaterial,
+        });
+      }}
     />
   );
 

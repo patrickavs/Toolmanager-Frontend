@@ -7,14 +7,14 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import Ionicon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import Tool from './Tool.ts';
 import Material from './Material.ts';
 import ObjectID from 'bson-objectid';
 
 const DetailView = ({route}: {route: any}) => {
-  const {item, itemType} = route.params;
+  const {item, itemType, onUpdateItem} = route.params;
   const navigation = useNavigation();
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
@@ -28,7 +28,7 @@ const DetailView = ({route}: {route: any}) => {
 
   const handleSave = () => {
     setIsEditing(false);
-    // Save logic here, e.g., update the state, make API calls, etc.
+    onUpdateItem(item._id, editedItem);
     console.log('Updated item:', editedItem);
   };
 
@@ -80,7 +80,7 @@ const DetailView = ({route}: {route: any}) => {
           <TouchableOpacity
             onPress={isEditing ? handleSave : handleEdit}
             style={styles.editButton}>
-            <Ionicon
+            <Ionicons
               name={isEditing ? 'checkmark-outline' : 'pencil-outline'}
               size={24}
               color="blue"
@@ -112,7 +112,7 @@ const DetailView = ({route}: {route: any}) => {
                     <TouchableOpacity
                       style={styles.deleteButton}
                       onPress={() => removeItemInput(index)}>
-                      <Ionicon
+                      <Ionicons
                         name="remove-circle-outline"
                         size={24}
                         color="red"
@@ -148,7 +148,7 @@ const DetailView = ({route}: {route: any}) => {
                     <TouchableOpacity
                       style={styles.deleteButton}
                       onPress={() => removeItemInput(index)}>
-                      <Ionicon
+                      <Ionicons
                         name="remove-circle-outline"
                         size={24}
                         color="red"

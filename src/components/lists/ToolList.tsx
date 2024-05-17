@@ -160,12 +160,16 @@ const ToolList = () => {
 
   const renderTool = ({item}: {item: Tool}) => (
     <ListItem
+      key={item._id}
       item={item}
       onDeleteItem={handleDeleteTool}
-      onUpdateItem={handleUpdateTool}
-      onClick={() =>
-        navigation.navigate('DetailView', {item: item, itemType: 'Tool'})
-      }
+      onClick={() => {
+        navigation.navigate('DetailView', {
+          item: item,
+          itemType: 'Tool',
+          onUpdateItem: handleUpdateTool,
+        });
+      }}
     />
   );
 
