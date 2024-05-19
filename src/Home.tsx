@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Ionicon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import ToolList from './components/tabs/ToolList.tsx';
 import MaterialList from './components/tabs/MaterialList.tsx';
 import DetailView from './components/DetailView.tsx';
@@ -62,7 +62,7 @@ const Home: React.FC = () => {
             iconName = focused ? 'person' : 'person-outline';
           }
 
-          return <Ionicon name={iconName || ''} color={color} size={30} />;
+          return <Ionicons name={iconName || ''} color={color} size={30} />;
         },
         headerShown: false,
         tabBarShowLabel: false,

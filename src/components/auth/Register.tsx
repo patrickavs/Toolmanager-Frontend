@@ -6,10 +6,10 @@ import {
   Text,
   StyleSheet,
   Image,
+  Alert,
 } from 'react-native';
-import {getUser, register} from '../../service/api.ts';
+import {register} from '../../service/api.ts';
 import {useNavigation} from '@react-navigation/native';
-import User from '../User.ts';
 
 const RegisterView: React.FC = () => {
   const navigation = useNavigation();
@@ -26,6 +26,7 @@ const RegisterView: React.FC = () => {
     password: '',
   });
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     validateForm();
@@ -59,18 +60,23 @@ const RegisterView: React.FC = () => {
     );
   };
 
-  const handleSubmit = async () => {
+  const handleRegister = async () => {
     if (isFormValid) {
+      setLoading(true);
       try {
         await register(name, email, password);
-        console.log('Registration successful!');
-        navigation.navigate('Login');
+        Alert.alert('Registration Successful', 'You can now login.');
+        navigation.goBack();
       } catch (error) {
-        console.error('Registration failed', error);
-        // Handle registration error
+        Alert.alert(
+          'Registration Failed',
+          'An error occurred during registration.',
+        );
+      } finally {
+        setLoading(false);
       }
     } else {
-      console.log('Form has errors. Please correct them.');
+      Alert.alert('Form has errors', 'Please correct them.');
     }
   };
 
@@ -99,6 +105,8 @@ const RegisterView: React.FC = () => {
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -106,20 +114,25 @@ const RegisterView: React.FC = () => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        autoCapitalize="none"
       />
       <TouchableOpacity
         style={[styles.button, {opacity: isFormValid ? 1 : 0.5}]}
         disabled={!isFormValid}
-        onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Register</Text>
+        onPress={handleRegister}>
+        <Text style={styles.buttonText}>
+          {!loading ? 'Register' : 'Registering'}
+        </Text>
       </TouchableOpacity>
 
       {/* Display error messages */}
-      {Object.values(errors).map((error, index) => (
-        <Text key={index} style={styles.error}>
-          {error}
-        </Text>
-      ))}
+      <View style={styles.errorContainer}>
+        {Object.values(errors).map((error, index) => (
+          <Text key={index} style={styles.error}>
+            {error}
+          </Text>
+        ))}
+      </View>
     </View>
   );
 };
@@ -158,6 +171,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  errorContainer: {
+    marginTop: 20,
   },
   error: {
     color: 'red',

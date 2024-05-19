@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   TextInput,
@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
@@ -14,49 +15,25 @@ import {login} from '../../service/api.ts';
 const LoginView: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [errors, setErrors] = useState<{email: string; password: string}>({
-    email: '',
-    password: '',
-  });
-  const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    validateForm();
-  }, [email, password]);
-
-  const validateForm = () => {
-    let errorProps = {email: '', password: ''};
-
-    // Validate email field
-    if (!email) {
-      errorProps.email = 'Email is required.';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errorProps.email = 'Email is invalid.';
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password.');
+      return;
     }
 
-    // Validate password field
-    if (!password) {
-      errorProps.password = 'Password is required.';
-    }
+    setLoading(true);
 
-    setErrors(errorProps);
-    setIsFormValid(!errorProps.email && !errorProps.password);
-  };
-
-  const handleSubmit = async () => {
-    if (isFormValid) {
-      try {
-        const token = await login(email, password);
-        await Keychain.setGenericPassword('token', token);
-        console.log('Login successful!');
-        navigation.navigate('Home');
-      } catch (error) {
-        console.error('Login failed', error);
-        alert('Login failed');
-      }
-    } else {
-      console.log('Form has errors. Please correct them.');
+    try {
+      const accessToken = await login(email, password);
+      await Keychain.setGenericPassword('accessToken', accessToken);
+      navigation.navigate('Home');
+    } catch (error) {
+      Alert.alert('Login Failed', 'Invalid email or password.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,6 +50,8 @@ const LoginView: React.FC = () => {
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -80,11 +59,15 @@ const LoginView: React.FC = () => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        autoCapitalize="none"
       />
       <TouchableOpacity
-        style={[styles.button, {opacity: isFormValid ? 1 : 0.5}]}
-        disabled={!isFormValid}
-        onPress={handleSubmit}>
+        style={[
+          styles.button,
+          {opacity: loading || email === '' || password === '' ? 0.5 : 1},
+        ]}
+        disabled={loading || email === '' || password === ''}
+        onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -92,13 +75,6 @@ const LoginView: React.FC = () => {
           Don't have an account? Register here
         </Text>
       </TouchableOpacity>
-
-      {/* Display error messages */}
-      {Object.values(errors).map((error, index) => (
-        <Text key={index} style={styles.error}>
-          {error}
-        </Text>
-      ))}
     </View>
   );
 };
@@ -139,10 +115,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   linkText: {
-    position: 'absolute',
     color: '#007bff',
     fontSize: 16,
-    marginTop: 100,
+    textAlign: 'center',
+    marginTop: 10,
   },
   error: {
     color: 'red',
