@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   FlatList,
   TextInput,
@@ -9,20 +9,15 @@ import {
   Button,
 } from 'react-native';
 
-import {
-  getMaterials,
-  addMaterial,
-  updateMaterial,
-  removeMaterial,
-} from '../../service/api.ts';
+import {getMaterials, addMaterial, removeMaterial} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
 import ObjectID from 'bson-objectid';
 import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
-import Ionicon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Tool from '../Tool.ts';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 const initialState: Material = {
   _id: ObjectID().toHexString(),
@@ -33,15 +28,27 @@ const initialState: Material = {
 
 const MaterialList = () => {
   const navigation = useNavigation();
-
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(initialState);
   const [toolInputs, setToolInputs] = useState<Tool[]>([]);
 
   useEffect(() => {
-    fetchMaterials().then(r => console.log(r));
+    fetchMaterials();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMaterials();
+    }, []),
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchMaterials();
+    setRefreshing(false);
+  };
 
   const fetchMaterials = async () => {
     try {
@@ -71,15 +78,6 @@ const MaterialList = () => {
       await fetchMaterials();
     } catch (error) {
       console.error('Error deleting material:', error);
-    }
-  };
-
-  const handleUpdateMaterial = async (id: string, data: Partial<Material>) => {
-    try {
-      await updateMaterial(id, data);
-      await fetchMaterials();
-    } catch (error) {
-      console.error('Error updating material:', error);
     }
   };
 
@@ -146,7 +144,7 @@ const MaterialList = () => {
             <TouchableOpacity
               style={{paddingLeft: 7}}
               onPress={() => removeToolInput(index)}>
-              <Ionicon name="remove-circle-outline" size={24} color="red" />
+              <Ionicons name="remove-circle-outline" size={24} color="red" />
             </TouchableOpacity>
           </View>
         ))}
@@ -158,18 +156,17 @@ const MaterialList = () => {
   };
 
   const renderMaterial = ({item}: {item: Material}) => (
-    <ListItem
-      key={item._id}
-      item={item}
-      onDeleteItem={handleDeleteMaterial}
-      onClick={() => {
-        navigation.navigate('DetailView', {
-          item: item,
-          itemType: 'Material',
-          onUpdateItem: handleUpdateMaterial,
-        });
-      }}
-    />
+    <TouchableOpacity
+      onPress={() =>
+        //@ts-ignore
+        navigation.navigate('DetailView', {item: item, type: 'Material'})
+      }>
+      <ListItem
+        key={item._id}
+        item={item}
+        onDeleteItem={handleDeleteMaterial}
+      />
+    </TouchableOpacity>
   );
 
   return (
@@ -177,6 +174,8 @@ const MaterialList = () => {
       <FlatList
         data={materials}
         renderItem={renderMaterial}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         keyExtractor={item => item._id}
         style={{paddingTop: 20}}
         ListFooterComponent={<View style={{height: 100}} />}

@@ -39,7 +39,7 @@ const addTool = async (tool: Tool) => {
   }
 };
 
-const updateTool = async (toolId: string, data: {}) => {
+const updateTool = async (toolId: string, data: any) => {
   try {
     await api.put(`tools/${toolId}`, data);
   } catch (error) {
@@ -88,7 +88,7 @@ const addMaterial = async (material: Material) => {
   }
 };
 
-const updateMaterial = async (materialId: string, data: {}) => {
+const updateMaterial = async (materialId: string, data: any) => {
   try {
     await api.put(`materials/${materialId}`, data);
   } catch (error) {

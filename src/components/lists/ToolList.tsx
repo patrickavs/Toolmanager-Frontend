@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   FlatList,
   TextInput,
@@ -9,15 +9,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import {getTools, addTool, updateTool, removeTool} from '../../service/api.ts';
+import {getTools, addTool, removeTool} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
 import ObjectID from 'bson-objectid';
 import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
 import Material from '../Material.ts';
-import Ionicon from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 const initialState: Tool = {
   _id: ObjectID().toHexString(),
@@ -28,15 +28,27 @@ const initialState: Tool = {
 
 const ToolList = () => {
   const navigation = useNavigation();
-
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [tools, setTools] = useState<Tool[]>([]);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newTool, setNewTool] = useState<Tool>(initialState);
   const [materialInputs, setMaterialInputs] = useState<Material[]>([]);
 
   useEffect(() => {
-    fetchTools().then(r => console.log(r));
+    fetchTools();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchTools();
+    }, []),
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchTools();
+    setRefreshing(false);
+  };
 
   const fetchTools = async () => {
     try {
@@ -66,15 +78,6 @@ const ToolList = () => {
       await fetchTools();
     } catch (error) {
       console.error('Error deleting tool:', error);
-    }
-  };
-
-  const handleUpdateTool = async (id: string, data: {}) => {
-    try {
-      await updateTool(id, data);
-      await fetchTools();
-    } catch (error) {
-      console.error('Error updating tool:', error);
     }
   };
 
@@ -143,7 +146,7 @@ const ToolList = () => {
             <TouchableOpacity
               style={{paddingLeft: 7}}
               onPress={() => removeMaterialInput(index)}>
-              <Ionicon name="remove-circle-outline" size={24} color="red" />
+              <Ionicons name="remove-circle-outline" size={24} color="red" />
             </TouchableOpacity>
           </View>
         ))}
@@ -159,18 +162,13 @@ const ToolList = () => {
   };
 
   const renderTool = ({item}: {item: Tool}) => (
-    <ListItem
-      key={item._id}
-      item={item}
-      onDeleteItem={handleDeleteTool}
-      onClick={() => {
-        navigation.navigate('DetailView', {
-          item: item,
-          itemType: 'Tool',
-          onUpdateItem: handleUpdateTool,
-        });
-      }}
-    />
+    <TouchableOpacity
+      onPress={() =>
+        //@ts-ignore
+        navigation.navigate('DetailView', {item: item, type: 'Tool'})
+      }>
+      <ListItem key={item._id} item={item} onDeleteItem={handleDeleteTool} />
+    </TouchableOpacity>
   );
 
   return (
@@ -178,6 +176,8 @@ const ToolList = () => {
       <FlatList
         data={tools}
         renderItem={renderTool}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         keyExtractor={item => item._id}
         style={{paddingTop: 20}}
         ListFooterComponent={<View style={{height: 100}} />}
