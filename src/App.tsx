@@ -3,6 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
 import Home from './Home.tsx';
 import AuthStackScreen from './AuthStack.tsx';
+import {ItemsProvider} from './context/ItemsContext.tsx';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -18,9 +19,11 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      {isAuthenticated ? <Home /> : <AuthStackScreen />}
-    </NavigationContainer>
+    <ItemsProvider>
+      <NavigationContainer>
+        {isAuthenticated ? <Home /> : <AuthStackScreen />}
+      </NavigationContainer>
+    </ItemsProvider>
   );
 };
 

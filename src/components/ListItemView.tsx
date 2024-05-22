@@ -6,10 +6,9 @@ import {CustomModal} from './CustomModal.tsx';
 interface ListItemProps {
   item: any;
   onDeleteItem: (id: string) => void;
-  onClick: () => void;
 }
 
-const ListItem: React.FC<ListItemProps> = ({item, onDeleteItem, onClick}) => {
+const ListItem: React.FC<ListItemProps> = ({item, onDeleteItem}) => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const renderFieldsDelete = () => {
@@ -22,32 +21,30 @@ const ListItem: React.FC<ListItemProps> = ({item, onDeleteItem, onClick}) => {
 
   return (
     <>
-      <TouchableOpacity onPress={onClick}>
-        <View key={item._id} style={styles.listItemContainer}>
-          <Text style={{fontSize: 15}}>{item.name}</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-            }}>
-            <TouchableOpacity onPress={() => setDeleteModalVisible(true)}>
-              <Ionicons
-                name="trash-outline"
-                size={24}
-                color="red"
-                style={{marginRight: 15}}
-              />
-            </TouchableOpacity>
-          </View>
-          <CustomModal
-            title={'Warning'}
-            fields={renderFieldsDelete()}
-            action={() => setDeleteModalVisible(false)}
-            modalVisible={deleteModalVisible}
-            buttonPressAction={() => onDeleteItem(item._id)}
-            deleteAction={true}
-          />
+      <View key={item._id} style={styles.listItemContainer}>
+        <Text style={{fontSize: 15}}>{item.name}</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+          }}>
+          <TouchableOpacity onPress={() => setDeleteModalVisible(true)}>
+            <Ionicons
+              name="trash-outline"
+              size={24}
+              color="red"
+              style={{marginRight: 15}}
+            />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+        <CustomModal
+          title={'Warning'}
+          fields={renderFieldsDelete()}
+          action={() => setDeleteModalVisible(false)}
+          modalVisible={deleteModalVisible}
+          buttonPressAction={() => onDeleteItem(item._id)}
+          deleteAction={true}
+        />
+      </View>
     </>
   );
 };

@@ -122,9 +122,13 @@ const register = async (name: string, email: string, password: string) => {
   }
 };
 
-const logout = async () => {
+const logout = async (token: string) => {
   try {
-    await api.post('/api/logout');
+    await api.post('/api/logout', null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     await Keychain.resetGenericPassword();
   } catch (error) {
     console.error('Error logging out:', error);

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   View,
   Text,
@@ -12,23 +12,35 @@ import {useNavigation} from '@react-navigation/native';
 import Tool from './Tool.ts';
 import Material from './Material.ts';
 import ObjectID from 'bson-objectid';
+import {ItemsContext} from '../context/ItemsContext.tsx';
 
 const DetailView = ({route}: {route: any}) => {
-  const {item, itemType, onUpdateItem} = route.params;
   const navigation = useNavigation();
+  const {item, type} = route.params;
+  const context = useContext(ItemsContext);
+  if (!context) {
+    throw new Error('ItemsContext must be used within an ItemsProvider');
+  }
+  const {modifyTool, modifyMaterial, receiveTool, receiveMaterial} = context;
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
   const [inputs, setInputs] = useState(
-    itemType === 'Tool' ? item.materials : item.tools,
+    type === 'Tool' ? item.materials : item.tools,
   );
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsEditing(false);
-    onUpdateItem(item._id, editedItem);
+    if (type === 'Tool') {
+      await modifyTool(item._id, editedItem);
+      setEditedItem(await receiveTool(item._id));
+    } else if (type === 'Material') {
+      await modifyMaterial(item._id, editedItem);
+      setEditedItem(await receiveMaterial(item._id));
+    }
     console.log('Updated item:', editedItem);
   };
 
@@ -42,7 +54,7 @@ const DetailView = ({route}: {route: any}) => {
     setInputs(updatedInputs);
     setEditedItem({
       ...editedItem,
-      [itemType === 'Tool' ? 'materials' : 'tools']: updatedInputs,
+      [type === 'Tool' ? 'materials' : 'tools']: updatedInputs,
     });
   };
 
@@ -60,7 +72,7 @@ const DetailView = ({route}: {route: any}) => {
     setInputs(updatedInputs);
     setEditedItem({
       ...editedItem,
-      [itemType === 'Tool' ? 'materials' : 'tools']: updatedInputs,
+      [type === 'Tool' ? 'materials' : 'tools']: updatedInputs,
     });
   };
 
@@ -75,7 +87,7 @@ const DetailView = ({route}: {route: any}) => {
               onChangeText={text => handleInputChange('name', text)}
             />
           ) : (
-            <Text style={styles.title}>{item.name}</Text>
+            <Text style={styles.title}>{editedItem.name}</Text>
           )}
           <TouchableOpacity
             onPress={isEditing ? handleSave : handleEdit}
@@ -95,9 +107,9 @@ const DetailView = ({route}: {route: any}) => {
             multiline
           />
         ) : (
-          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.description}>{editedItem.description}</Text>
         )}
-        {itemType === 'Tool' && (
+        {type === 'Tool' && (
           <View>
             <Text style={styles.sectionTitle}>Materials:</Text>
             {inputs.map((material: Material, index: number) => (
@@ -133,7 +145,7 @@ const DetailView = ({route}: {route: any}) => {
             )}
           </View>
         )}
-        {itemType === 'Material' && (
+        {type === 'Material' && (
           <View>
             <Text style={styles.sectionTitle}>Tools:</Text>
             {inputs.map((tool: Tool, index: number) => (
@@ -267,7 +279,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
-    alignItems: 'center',
+    width: 100,
+    display: 'flex',
+    alignSelf: 'center',
   },
 });
 
