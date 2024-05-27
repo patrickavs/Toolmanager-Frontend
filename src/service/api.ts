@@ -10,7 +10,7 @@ const api = axios.create({
 
 // Tools
 
-const getTools = async () => {
+const get_Tools = async () => {
   try {
     const response = await api.get('/tools');
     return response.data;
@@ -20,7 +20,7 @@ const getTools = async () => {
   }
 };
 
-const getTool = async (id: string) => {
+const get_Tool = async (id: string) => {
   try {
     const response = await api.get(`/tools/${id}`);
     return response.data;
@@ -30,7 +30,7 @@ const getTool = async (id: string) => {
   }
 };
 
-const addTool = async (tool: Tool) => {
+const add_Tool = async (tool: Tool) => {
   try {
     await api.post('tools', tool);
   } catch (error) {
@@ -39,7 +39,7 @@ const addTool = async (tool: Tool) => {
   }
 };
 
-const updateTool = async (toolId: string, data: any) => {
+const update_Tool = async (toolId: string, data: any) => {
   try {
     await api.put(`tools/${toolId}`, data);
   } catch (error) {
@@ -48,7 +48,7 @@ const updateTool = async (toolId: string, data: any) => {
   }
 };
 
-const removeTool = async (toolId: string) => {
+const remove_Tool = async (toolId: string) => {
   try {
     await api.delete(`tools/${toolId}`);
   } catch (error) {
@@ -59,7 +59,7 @@ const removeTool = async (toolId: string) => {
 
 // Materials
 
-const getMaterials = async () => {
+const get_Materials = async () => {
   try {
     const response = await api.get('/materials');
     return response.data;
@@ -69,7 +69,7 @@ const getMaterials = async () => {
   }
 };
 
-const getMaterial = async (id: string) => {
+const get_Material = async (id: string) => {
   try {
     const response = await api.get(`/materials/${id}`);
     return response.data;
@@ -79,7 +79,7 @@ const getMaterial = async (id: string) => {
   }
 };
 
-const addMaterial = async (material: Material) => {
+const add_Material = async (material: Material) => {
   try {
     await api.post('materials', material);
   } catch (error) {
@@ -88,7 +88,7 @@ const addMaterial = async (material: Material) => {
   }
 };
 
-const updateMaterial = async (materialId: string, data: any) => {
+const update_Material = async (materialId: string, data: any) => {
   try {
     await api.put(`materials/${materialId}`, data);
   } catch (error) {
@@ -97,7 +97,7 @@ const updateMaterial = async (materialId: string, data: any) => {
   }
 };
 
-const removeMaterial = async (materialId: string) => {
+const remove_Material = async (materialId: string) => {
   try {
     await api.delete(`materials/${materialId}`);
   } catch (error) {
@@ -107,14 +107,14 @@ const removeMaterial = async (materialId: string) => {
 };
 
 export {
-  getTools,
-  getTool,
-  addTool,
-  removeTool,
-  updateTool,
-  getMaterials,
-  getMaterial,
-  addMaterial,
-  updateMaterial,
-  removeMaterial,
+  get_Tools,
+  get_Tool,
+  add_Tool,
+  remove_Tool,
+  update_Tool,
+  get_Materials,
+  get_Material,
+  add_Material,
+  update_Material,
+  remove_Material,
 };
