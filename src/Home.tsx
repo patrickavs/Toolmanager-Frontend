@@ -50,6 +50,7 @@ const Tab = createBottomTabNavigator();
 const Home: React.FC = () => {
   return (
     <Tab.Navigator
+      initialRouteName="ToolStack"
       screenOptions={({route}) => ({
         tabBarIcon: ({color, focused}) => {
           let iconName;

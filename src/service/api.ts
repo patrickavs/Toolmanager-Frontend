@@ -64,38 +64,38 @@ api.interceptors.response.use(
 
 // Tools
 
-const getTools = async () => handleRequest(() => api.get('/tools'));
-const getTool = async (id: string) =>
+const get_Tools = async () => handleRequest(() => api.get('/tools'));
+const get_Tool = async (id: string) =>
   handleRequest(() => api.get(`/tools/${id}`));
-const addTool = async (tool: Tool) =>
+const add_Tool = async (tool: Tool) =>
   handleRequest(() => api.post('tools', tool));
-const updateTool = async (toolId: string, data: {}) =>
+const update_Tool = async (toolId: string, data: {}) =>
   handleRequest(() => api.put(`tools/${toolId}`, data));
-const removeTool = async (toolId: string) =>
+const remove_Tool = async (toolId: string) =>
   handleRequest(() => api.delete(`tools/${toolId}`));
 
 // Materials
 
-const getMaterials = async () => handleRequest(() => api.get('/materials'));
-const getMaterial = async (id: string) =>
+const get_Materials = async () => handleRequest(() => api.get('/materials'));
+const get_Material = async (id: string) =>
   handleRequest(() => api.get(`/materials/${id}`));
-const addMaterial = async (material: Material) =>
+const add_Material = async (material: Material) =>
   handleRequest(() => api.post('materials', material));
-const updateMaterial = async (materialId: string, data: {}) =>
+const update_Material = async (materialId: string, data: {}) =>
   handleRequest(() => api.put(`materials/${materialId}`, data));
-const removeMaterial = async (materialId: string) =>
+const remove_Material = async (materialId: string) =>
   handleRequest(() => api.delete(`materials/${materialId}`));
 
 // Users
 
-const getUsers = async () => handleRequest(() => api.get('/users'));
-const getUser = async (id: string) =>
+const get_Users = async () => handleRequest(() => api.get('/users'));
+const get_User = async (id: string) =>
   handleRequest(() => api.get(`/users/${id}`));
-const addUser = async (user: User) =>
+const add_User = async (user: User) =>
   handleRequest(() => api.post('users', user));
-const updateUser = async (userId: string, data: {}) =>
+const update_User = async (userId: string, data: {}) =>
   handleRequest(() => api.put(`users/${userId}`, data));
-const removeUser = async (userId: string) =>
+const remove_User = async (userId: string) =>
   handleRequest(() => api.delete(`users/${userId}`));
 
 // Authentication
@@ -148,21 +148,21 @@ const handleRequest = async (request: () => Promise<any>) => {
 };
 
 export {
-  getTools,
-  getTool,
-  addTool,
-  removeTool,
-  updateTool,
-  getMaterials,
-  getMaterial,
-  addMaterial,
-  updateMaterial,
-  removeMaterial,
-  getUsers,
-  getUser,
-  addUser,
-  updateUser,
-  removeUser,
+  get_Tools,
+  get_Tool,
+  add_Tool,
+  remove_Tool,
+  update_Tool,
+  get_Materials,
+  get_Material,
+  add_Material,
+  update_Material,
+  remove_Material,
+  get_Users,
+  get_User,
+  add_User,
+  update_User,
+  remove_User,
   login,
   register,
   logout,

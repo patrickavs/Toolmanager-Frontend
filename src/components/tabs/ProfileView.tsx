@@ -4,7 +4,8 @@ import {Avatar, Text, Button} from 'react-native-elements';
 import {useNavigation} from '@react-navigation/native';
 import User from '../User.ts';
 import * as Keychain from 'react-native-keychain';
-import {logout} from '../../service/api.ts';
+import {logout, remove_User} from '../../service/api.ts';
+import { navigate } from "ionicons/icons";
 
 const ProfileView = (user: User) => {
   const navigation = useNavigation();
@@ -17,11 +18,18 @@ const ProfileView = (user: User) => {
         await logout(token);
         await Keychain.resetGenericPassword();
         //@ts-ignore
-        navigation.navigate('AuthStackScreen');
+        navigation.navigate('Home');
       }
     } catch (error) {
       console.error('Logout failed', error);
     }
+  };
+
+  const handleRemoveUser = async (id: string) => {
+    await handleLogout();
+    await remove_User(id);
+    //@ts-ignore
+    navigation.navigate('Login');
   };
 
   return (
@@ -53,7 +61,13 @@ const ProfileView = (user: User) => {
         </Text>
         <Text style={styles.sectionContent}>{user.aboutMe}</Text>
       </View>
-      <Button title="Logout" onPress={handleLogout} />
+      <View style={{gap: 20}}>
+        <Button title="Logout" onPress={handleLogout} />
+        <Button
+          title={'Delete Account'}
+          onPress={() => handleRemoveUser(user._id)}
+        />
+      </View>
     </ScrollView>
   );
 };

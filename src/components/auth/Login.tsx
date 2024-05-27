@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
-import {login} from '../../service/api.ts';
+import { get_User, login } from "../../service/api.ts";
+import User from "../User.ts";
+import Home from "../../Home.tsx";
 
 const LoginView: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -30,7 +32,7 @@ const LoginView: React.FC = () => {
       const accessToken = await login(email, password);
       await Keychain.setGenericPassword('accessToken', accessToken);
       //@ts-ignore
-      navigation.navigate('Home');
+      navigation.navigate('App');
     } catch (error) {
       Alert.alert('Login Failed', 'Invalid email or password.');
     } finally {
