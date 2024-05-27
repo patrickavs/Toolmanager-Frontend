@@ -4,6 +4,7 @@ import {Avatar, Text, Button} from 'react-native-elements';
 import {useNavigation} from '@react-navigation/native';
 import User from '../User.ts';
 import * as Keychain from 'react-native-keychain';
+import {logout} from '../../service/api.ts';
 
 const ProfileView = (user: User) => {
   const navigation = useNavigation();
@@ -13,12 +14,9 @@ const ProfileView = (user: User) => {
       const credentials = await Keychain.getGenericPassword();
       if (credentials) {
         const token = credentials.password;
-        await api.post('/api/logout', null, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await logout(token);
         await Keychain.resetGenericPassword();
+        //@ts-ignore
         navigation.navigate('AuthStackScreen');
       }
     } catch (error) {
@@ -45,6 +43,7 @@ const ProfileView = (user: User) => {
         <Button
           title="Edit Profile"
           buttonStyle={styles.button}
+          //@ts-ignore
           onPress={() => navigation.navigate('Edit')}
         />
       </View>

@@ -29,6 +29,7 @@ const LoginView: React.FC = () => {
     try {
       const accessToken = await login(email, password);
       await Keychain.setGenericPassword('accessToken', accessToken);
+      //@ts-ignore
       navigation.navigate('Home');
     } catch (error) {
       Alert.alert('Login Failed', 'Invalid email or password.');
@@ -42,7 +43,7 @@ const LoginView: React.FC = () => {
       <Image
         borderRadius={10}
         source={require('../../assets/images/signIn.png')}
-        style={{width: 330, height: 250, bottom: 60, borderRadius: 10}}
+        style={styles.image}
       />
       <Text style={styles.header}>Login</Text>
       <TextInput
@@ -70,6 +71,7 @@ const LoginView: React.FC = () => {
         onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
+      {/*@ts-ignore*/}
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.linkText}>
           Don't have an account? Register here
@@ -91,6 +93,12 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  image: {
+    width: 330,
+    height: 250,
+    bottom: 60,
+    borderRadius: 10,
   },
   input: {
     height: 60,

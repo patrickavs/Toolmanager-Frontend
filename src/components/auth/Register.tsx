@@ -29,36 +29,35 @@ const RegisterView: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const validateForm = () => {
+      let errorProps = {name: '', email: '', password: ''};
+
+      // Validate name field
+      if (!name) {
+        errorProps.name = 'Name is required.';
+      }
+
+      // Validate email field
+      if (!email) {
+        errorProps.email = 'Email is required.';
+      } else if (!/\S+@\S+\.\S+/.test(email)) {
+        errorProps.email = 'Email is invalid.';
+      }
+
+      // Validate password field
+      if (!password) {
+        errorProps.password = 'Password is required.';
+      } else if (password.length < 8) {
+        errorProps.password = 'Password must be at least 8 characters.';
+      }
+
+      setErrors(errorProps);
+      setIsFormValid(
+        !errorProps.name && !errorProps.email && !errorProps.password,
+      );
+    };
     validateForm();
   }, [name, email, password]);
-
-  const validateForm = () => {
-    let errorProps = {name: '', email: '', password: ''};
-
-    // Validate name field
-    if (!name) {
-      errorProps.name = 'Name is required.';
-    }
-
-    // Validate email field
-    if (!email) {
-      errorProps.email = 'Email is required.';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errorProps.email = 'Email is invalid.';
-    }
-
-    // Validate password field
-    if (!password) {
-      errorProps.password = 'Password is required.';
-    } else if (password.length < 8) {
-      errorProps.password = 'Password must be at least 8 characters.';
-    }
-
-    setErrors(errorProps);
-    setIsFormValid(
-      !errorProps.name && !errorProps.email && !errorProps.password,
-    );
-  };
 
   const handleRegister = async () => {
     if (isFormValid) {
@@ -85,13 +84,7 @@ const RegisterView: React.FC = () => {
       <Image
         borderRadius={10}
         source={require('../../assets/images/signUp.png')}
-        style={{
-          width: 300,
-          height: 250,
-          bottom: 30,
-          marginTop: 20,
-          borderRadius: 10,
-        }}
+        style={styles.image}
       />
       <Text style={styles.header}>Register</Text>
       <TextInput
@@ -158,6 +151,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     fontSize: 16,
+  },
+  image: {
+    width: 300,
+    height: 250,
+    bottom: 30,
+    marginTop: 20,
+    borderRadius: 10,
   },
   button: {
     backgroundColor: 'green',
