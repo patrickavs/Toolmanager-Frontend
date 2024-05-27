@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState} from 'react';
 import {
   FlatList,
   TextInput,
@@ -8,8 +8,6 @@ import {
   Button,
   TouchableOpacity,
 } from 'react-native';
-
-import {getTools, addTool, removeTool} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
 import ObjectID from 'bson-objectid';
@@ -17,7 +15,9 @@ import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
 import Material from '../Material.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {useItemsContext} from '../../context/ItemsContext.tsx';
+import useTools from '../hooks/useTools.ts';
 
 const initialState: Tool = {
   _id: ObjectID().toHexString(),
@@ -28,35 +28,16 @@ const initialState: Tool = {
 
 const ToolList = () => {
   const navigation = useNavigation();
+  const tools = useTools();
+  const {addTool, deleteTool, fetchTools} = useItemsContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [tools, setTools] = useState<Tool[]>([]);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newTool, setNewTool] = useState<Tool>(initialState);
   const [materialInputs, setMaterialInputs] = useState<Material[]>([]);
 
-  useEffect(() => {
-    fetchTools();
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchTools();
-    }, []),
-  );
-
   const onRefresh = () => {
     setRefreshing(true);
-    fetchTools();
-    setRefreshing(false);
-  };
-
-  const fetchTools = async () => {
-    try {
-      const fetchedTools = await getTools();
-      setTools(fetchedTools);
-    } catch (error) {
-      console.error('Error fetching tools:', error);
-    }
+    fetchTools().then(() => setRefreshing(false));
   };
 
   const handleAddTool = async () => {
@@ -65,7 +46,6 @@ const ToolList = () => {
       setIsAddItemModalVisible(false);
       setNewTool(initialState);
       setMaterialInputs([]);
-      await fetchTools();
     } catch (error) {
       console.error('Error adding tool:', error);
     }
@@ -73,9 +53,7 @@ const ToolList = () => {
 
   const handleDeleteTool = async (id: string) => {
     try {
-      await removeTool(id);
-      setTools(tools.filter(tool => tool._id !== id));
-      await fetchTools();
+      await deleteTool(id);
     } catch (error) {
       console.error('Error deleting tool:', error);
     }

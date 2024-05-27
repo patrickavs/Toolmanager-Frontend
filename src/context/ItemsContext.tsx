@@ -1,13 +1,32 @@
-import React, {createContext, ReactNode} from 'react';
-import Tool from '../components/Tool';
-import Material from '../components/Material';
-import {getMaterial, getTool, updateMaterial, updateTool} from '../service/api';
+import React, {createContext, ReactNode, useContext, useState} from 'react';
+import {
+  add_Material,
+  add_Tool,
+  get_Material,
+  get_Materials,
+  get_Tool,
+  get_Tools,
+  remove_Material,
+  remove_Tool,
+  update_Material,
+  update_Tool,
+} from '../service/api.ts';
+import Tool from '../components/Tool.ts';
+import Material from '../components/Material.ts';
 
 interface ItemsContextType {
+  tools: Tool[];
+  materials: Material[];
+  fetchTools: () => Promise<void>;
+  fetchMaterials: () => Promise<void>;
+  fetchTool: (id: string) => Promise<void>;
+  fetchMaterial: (id: string) => Promise<void>;
+  addTool: (newTool: Tool) => Promise<void>;
+  addMaterial: (newMaterial: Material) => Promise<void>;
   modifyTool: (id: string, updatedTool: Tool) => Promise<void>;
   modifyMaterial: (id: string, updatedMaterial: Material) => Promise<void>;
-  receiveTool: (id: string) => Promise<Tool>;
-  receiveMaterial: (id: string) => Promise<Material>;
+  deleteTool: (id: string) => Promise<void>;
+  deleteMaterial: (id: string) => Promise<void>;
 }
 
 export const ItemsContext = createContext<ItemsContextType | undefined>(
@@ -15,26 +34,82 @@ export const ItemsContext = createContext<ItemsContextType | undefined>(
 );
 
 export const ItemsProvider = ({children}: {children: ReactNode}) => {
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [materials, setMaterials] = useState<Material[]>([]);
+
+  const fetchTools = async () => {
+    const fetchedTools = await get_Tools();
+    setTools(fetchedTools);
+  };
+
+  const fetchMaterials = async () => {
+    const fetchedMaterials = await get_Materials();
+    setMaterials(fetchedMaterials);
+  };
+
+  const fetchTool = async (id: string) => {
+    return await get_Tool(id);
+  };
+
+  const fetchMaterial = async (id: string) => {
+    return await get_Material(id);
+  };
+
+  const addTool = async (newTool: Tool) => {
+    await add_Tool(newTool);
+    await fetchTools();
+  };
+
+  const addMaterial = async (newMaterial: Material) => {
+    await add_Material(newMaterial);
+    await fetchMaterials();
+  };
+
   const modifyTool = async (id: string, updatedTool: Tool) => {
-    await updateTool(id, updatedTool);
+    await update_Tool(id, updatedTool);
+    await fetchTools();
   };
 
   const modifyMaterial = async (id: string, updatedMaterial: Material) => {
-    await updateMaterial(id, updatedMaterial);
+    await update_Material(id, updatedMaterial);
+    await fetchMaterials();
   };
 
-  const receiveTool = async (id: string): Promise<Tool> => {
-    return await getTool(id);
+  const deleteTool = async (id: string) => {
+    await remove_Tool(id);
+    await fetchTools();
   };
 
-  const receiveMaterial = async (id: string): Promise<Material> => {
-    return await getMaterial(id);
+  const deleteMaterial = async (id: string) => {
+    await remove_Material(id);
+    await fetchMaterials();
   };
 
   return (
     <ItemsContext.Provider
-      value={{modifyTool, modifyMaterial, receiveTool, receiveMaterial}}>
+      value={{
+        tools,
+        materials,
+        fetchTools,
+        fetchMaterials,
+        fetchTool,
+        fetchMaterial,
+        addTool,
+        addMaterial,
+        modifyTool,
+        modifyMaterial,
+        deleteTool,
+        deleteMaterial,
+      }}>
       {children}
     </ItemsContext.Provider>
   );
+};
+
+export const useItemsContext = () => {
+  const context = useContext(ItemsContext);
+  if (context === undefined) {
+    throw new Error('useItems must be used within an ItemsProvider');
+  }
+  return context;
 };

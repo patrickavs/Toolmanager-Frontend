@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -12,16 +12,12 @@ import {useNavigation} from '@react-navigation/native';
 import Tool from './Tool.ts';
 import Material from './Material.ts';
 import ObjectID from 'bson-objectid';
-import {ItemsContext} from '../context/ItemsContext.tsx';
+import {useItemsContext} from '../context/ItemsContext.tsx';
 
 const DetailView = ({route}: {route: any}) => {
   const navigation = useNavigation();
   const {item, type} = route.params;
-  const context = useContext(ItemsContext);
-  if (!context) {
-    throw new Error('ItemsContext must be used within an ItemsProvider');
-  }
-  const {modifyTool, modifyMaterial, receiveTool, receiveMaterial} = context;
+  const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} = useItemsContext();
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
   const [inputs, setInputs] = useState(
@@ -36,10 +32,10 @@ const DetailView = ({route}: {route: any}) => {
     setIsEditing(false);
     if (type === 'Tool') {
       await modifyTool(item._id, editedItem);
-      setEditedItem(await receiveTool(item._id));
+      setEditedItem(await fetchTool(item._id));
     } else if (type === 'Material') {
       await modifyMaterial(item._id, editedItem);
-      setEditedItem(await receiveMaterial(item._id));
+      setEditedItem(await fetchMaterial(item._id));
     }
     console.log('Updated item:', editedItem);
   };

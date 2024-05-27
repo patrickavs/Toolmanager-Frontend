@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState} from 'react';
 import {
   FlatList,
   TextInput,
@@ -8,8 +8,6 @@ import {
   TouchableOpacity,
   Button,
 } from 'react-native';
-
-import {getMaterials, addMaterial, removeMaterial} from '../../service/api.ts';
 import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
 import ObjectID from 'bson-objectid';
@@ -17,7 +15,9 @@ import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Tool from '../Tool.ts';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {useItemsContext} from '../../context/ItemsContext.tsx';
+import useMaterials from '../hooks/useMaterials.ts';
 
 const initialState: Material = {
   _id: ObjectID().toHexString(),
@@ -28,35 +28,16 @@ const initialState: Material = {
 
 const MaterialList = () => {
   const navigation = useNavigation();
+  const materials = useMaterials();
+  const {addMaterial, deleteMaterial, fetchMaterials} = useItemsContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [materials, setMaterials] = useState<Material[]>([]);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(initialState);
   const [toolInputs, setToolInputs] = useState<Tool[]>([]);
 
-  useEffect(() => {
-    fetchMaterials();
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchMaterials();
-    }, []),
-  );
-
   const onRefresh = () => {
     setRefreshing(true);
-    fetchMaterials();
-    setRefreshing(false);
-  };
-
-  const fetchMaterials = async () => {
-    try {
-      const fetchedMaterials = await getMaterials();
-      setMaterials(fetchedMaterials);
-    } catch (error) {
-      console.error('Error fetching materials:', error);
-    }
+    fetchMaterials().then(() => setRefreshing(false));
   };
 
   const handleAddMaterial = async () => {
@@ -65,7 +46,6 @@ const MaterialList = () => {
       setIsAddItemModalVisible(false);
       setNewMaterial(initialState);
       setToolInputs([]);
-      await fetchMaterials();
     } catch (error) {
       console.error('Error adding material:', error);
     }
@@ -73,9 +53,7 @@ const MaterialList = () => {
 
   const handleDeleteMaterial = async (id: string) => {
     try {
-      await removeMaterial(id);
-      setMaterials(materials.filter(material => material._id !== id));
-      await fetchMaterials();
+      await deleteMaterial(id);
     } catch (error) {
       console.error('Error deleting material:', error);
     }
