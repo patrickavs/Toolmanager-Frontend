@@ -33,6 +33,8 @@ const refreshAccessToken = async () => {
       );
       const {access_token} = response.data;
       await Keychain.setGenericPassword('accessToken', access_token);
+      // Update access token in Axios instance
+      api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
       return access_token;
     }
   } catch (error) {
@@ -52,10 +54,14 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const newAccessToken = await refreshAccessToken();
+      const newAccessToken = await refreshAccessToken().catch(r =>
+        console.error(r),
+      );
       if (newAccessToken) {
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
+        return api(originalRequest).catch(r => {
+          console.error(r);
+        });
       }
     }
     return Promise.reject(error);

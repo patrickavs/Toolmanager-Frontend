@@ -35,7 +35,7 @@ const App: React.FC = () => {
       }
     };
     checkLoginStatus().then(r => console.log(r));
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <ItemsProvider>

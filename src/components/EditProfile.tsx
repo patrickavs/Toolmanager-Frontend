@@ -5,34 +5,41 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
+import {useRoute} from '@react-navigation/native';
+import {update_User} from '../service/api.ts';
 
 interface Errors {
   name: string;
   email: string;
-  password: string;
 }
 
 const EditProfile = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const route = useRoute();
+  const {user} = route.params;
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [aboutMe, setAboutMe] = useState('');
+  const [bio, setBio] = useState('');
   const [errors, setErrors] = useState<Errors>({
     name: '',
     email: '',
-    password: '',
   });
   const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     validateForm();
-  }, [name, email, password]);
+  }, [name, email, aboutMe, bio]);
+
+  if (!user) {
+    return <Text>Failed to fetch data</Text>;
+  }
 
   const validateForm = () => {
     let errorProps: Errors = {
       name: '',
       email: '',
-      password: '',
     };
 
     // Validate name field
@@ -47,22 +54,19 @@ const EditProfile = () => {
       errorProps.email = 'Email is invalid.';
     }
 
-    // Validate password field
-    if (!password) {
-      errorProps.password = 'Password is required.';
-    } else if (password.length < 8) {
-      errorProps.password = 'Password must be at least 8 characters.';
-    }
-
     setErrors(errorProps);
-    setIsFormValid(
-      !errorProps.name && !errorProps.email && !errorProps.password,
-    );
+    setIsFormValid(!errorProps.name && !errorProps.email);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isFormValid) {
-      // Submission logic
+      await update_User(user._id, {
+        ...user,
+        name: name,
+        email: email,
+        aboutMe: aboutMe,
+        bio: bio,
+      });
       console.log('Form submitted successfully!');
     } else {
       console.log('Form has errors. Please correct them.');
@@ -70,41 +74,48 @@ const EditProfile = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Edit Profile</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TouchableOpacity
-        style={[styles.button, {opacity: isFormValid ? 1 : 0.5}]}
-        disabled={!isFormValid}
-        onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
-      </TouchableOpacity>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.header}>Edit Profile</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="About Me"
+          value={aboutMe}
+          onChangeText={setAboutMe}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Bio"
+          value={bio}
+          onChangeText={setBio}
+        />
+        <TouchableOpacity
+          style={[styles.button, {opacity: isFormValid ? 1 : 0.5}]}
+          disabled={!isFormValid}
+          onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
 
-      {/* Display error messages */}
-      {Object.values(errors).map((error, index) => (
-        <Text key={index} style={styles.error}>
-          {error}
-        </Text>
-      ))}
-    </View>
+        {/* Display error messages */}
+        {Object.values(errors).map((error, index) => (
+          <Text key={index} style={styles.error}>
+            {error}
+          </Text>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 

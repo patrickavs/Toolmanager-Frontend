@@ -26,14 +26,15 @@ const ProfileView = () => {
           const fetchedUser = await get_User('me');
           setUser(fetchedUser);
         }
-        setLoading(false);
       } catch (error) {
         console.error('Failed to fetch user', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUser();
-  }, []);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -104,7 +105,7 @@ const ProfileView = () => {
         <Button
           title="Edit Profile"
           //@ts-ignore
-          onPress={() => navigation.navigate('Edit')}
+          onPress={() => navigation.navigate('Edit', {user: user})}
         />
       </View>
       <View style={styles.body}>
@@ -166,6 +167,7 @@ const styles = StyleSheet.create({
   sectionContent: {
     fontSize: 16,
     color: 'gray',
+    paddingBottom: 40,
   },
   loadingContainer: {
     flex: 1,
