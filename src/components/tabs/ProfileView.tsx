@@ -1,14 +1,39 @@
-import React from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  ActivityIndicator,
+  Modal,
+} from 'react-native';
 import {Avatar, Text, Button} from 'react-native-elements';
 import {useNavigation} from '@react-navigation/native';
-import User from '../User.ts';
 import * as Keychain from 'react-native-keychain';
-import {logout, remove_User} from '../../service/api.ts';
-import { navigate } from "ionicons/icons";
+import {get_User, logout, remove_User} from '../../service/api';
+import User from '../User';
 
-const ProfileView = (user: User) => {
+const ProfileView = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
+  const [showModal, setShowModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const credentials = await Keychain.getGenericPassword();
+        if (credentials) {
+          const fetchedUser = await get_User('me');
+          setUser(fetchedUser);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch user', error);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -18,7 +43,7 @@ const ProfileView = (user: User) => {
         await logout(token);
         await Keychain.resetGenericPassword();
         //@ts-ignore
-        navigation.navigate('Home');
+        navigation.navigate('Auth', {screen: 'Login'});
       }
     } catch (error) {
       console.error('Logout failed', error);
@@ -26,16 +51,44 @@ const ProfileView = (user: User) => {
   };
 
   const handleRemoveUser = async (id: string) => {
-    await handleLogout();
     await remove_User(id);
     //@ts-ignore
-    navigation.navigate('Login');
+    navigation.navigate('Auth', {screen: 'Login'});
   };
+
+  const confirmDeleteAccount = () => {
+    setShowModal(true);
+  };
+
+  const cancelDeleteAccount = () => {
+    setShowModal(false);
+  };
+
+  const proceedDeleteAccount = (id: string) => {
+    handleRemoveUser(id);
+    setShowModal(false);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Failed to load user data</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        {user ? (
+        {user.profilePic ? (
           <Avatar
             rounded
             size="xlarge"
@@ -50,7 +103,6 @@ const ProfileView = (user: User) => {
         <Text style={styles.bio}>{user.bio}</Text>
         <Button
           title="Edit Profile"
-          buttonStyle={styles.button}
           //@ts-ignore
           onPress={() => navigation.navigate('Edit')}
         />
@@ -63,11 +115,25 @@ const ProfileView = (user: User) => {
       </View>
       <View style={{gap: 20}}>
         <Button title="Logout" onPress={handleLogout} />
-        <Button
-          title={'Delete Account'}
-          onPress={() => handleRemoveUser(user._id)}
-        />
+        <Button title="Delete Account" onPress={confirmDeleteAccount} />
       </View>
+      <Modal visible={showModal} animationType="fade" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete your account?
+            </Text>
+            <View style={styles.modalButtons}>
+              <Button title="Cancel" onPress={cancelDeleteAccount} />
+              <Button
+                title="Delete"
+                onPress={() => proceedDeleteAccount(user?._id)}
+                buttonStyle={{backgroundColor: 'red'}}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -90,9 +156,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginBottom: 10,
   },
-  button: {
-    backgroundColor: '#007bff',
-  },
   body: {
     marginTop: 20,
   },
@@ -103,6 +166,33 @@ const styles = StyleSheet.create({
   sectionContent: {
     fontSize: 16,
     color: 'gray',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 30,
+    borderRadius: 10,
+    elevation: 5,
+    gap: 20,
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
 });
 
