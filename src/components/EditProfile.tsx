@@ -17,11 +17,12 @@ interface Errors {
 
 const EditProfile = () => {
   const route = useRoute();
+  // @ts-ignore
   const {user} = route.params;
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [aboutMe, setAboutMe] = useState('');
-  const [bio, setBio] = useState('');
+  const [aboutMe, setAboutMe] = useState(user?.aboutMe || '');
+  const [bio, setBio] = useState(user?.bio || '');
   const [errors, setErrors] = useState<Errors>({
     name: '',
     email: '',

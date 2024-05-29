@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useCallback, useState } from "react";
 import {
   View,
   TextInput,
@@ -8,7 +8,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Keychain from 'react-native-keychain';
 import {login} from '../../service/api.ts';
 
@@ -43,6 +43,12 @@ const LoginView: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      resetForm();
+    }, []),
+  );
 
   return (
     <View style={styles.container}>
