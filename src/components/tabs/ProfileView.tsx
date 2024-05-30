@@ -31,6 +31,7 @@ const ProfileView = () => {
   const fetchUser = async () => {
     try {
       const credentials = await Keychain.getGenericPassword();
+      console.log(credentials);
       if (credentials) {
         const fetchedUser = await get_User('me');
         setUser(fetchedUser);

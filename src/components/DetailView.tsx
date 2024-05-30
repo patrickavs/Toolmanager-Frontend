@@ -17,7 +17,8 @@ import {useItemsContext} from '../context/ItemsContext.tsx';
 const DetailView = ({route}: {route: any}) => {
   const navigation = useNavigation();
   const {item, type} = route.params;
-  const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} = useItemsContext();
+  const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} =
+    useItemsContext();
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
   const [inputs, setInputs] = useState(
