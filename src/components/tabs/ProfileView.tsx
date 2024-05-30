@@ -37,6 +37,7 @@ const ProfileView = () => {
       }
     } catch (error) {
       console.error('Failed to fetch user', error);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
