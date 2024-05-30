@@ -1,4 +1,10 @@
-import React, {createContext, ReactNode, useContext, useState} from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {
   add_Material,
   add_Tool,
@@ -84,6 +90,11 @@ export const ItemsProvider = ({children}: {children: ReactNode}) => {
     await remove_Material(id);
     await fetchMaterials();
   };
+
+  useEffect(() => {
+    fetchTools();
+    fetchMaterials();
+  }, []);
 
   return (
     <ItemsContext.Provider

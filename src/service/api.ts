@@ -95,14 +95,18 @@ const remove_Material = async (materialId: string) =>
 // Users
 
 const get_Users = async () => handleRequest(() => api.get('/users'));
-const get_User = async (id: string) =>
-  handleRequest(() => api.get(`/users/${id}`));
+const get_User = async (email: string) =>
+  handleRequest(() => api.get(`/users/${email}`));
 const add_User = async (user: User) =>
   handleRequest(() => api.post('users', user));
-const update_User = async (userId: string, data: {}) =>
-  handleRequest(() => api.put(`users/${userId}`, data));
+const update_User = async (email: string, data: {}) =>
+  handleRequest(() => api.put(`users/${email}`, data));
 const remove_User = async (userId: string) =>
   handleRequest(() => api.delete(`users/${userId}`));
+const get_Tools_For_User = async (email: string) =>
+  handleRequest(() => api.get(`/tools/${email}`));
+const get_Materials_For_User = async (email: string) =>
+  handleRequest(() => api.get(`/materials/${email}`));
 
 // Authentication
 
@@ -110,7 +114,6 @@ const login = async (email: string, password: string) => {
   try {
     const response = await api.post('/api/login', {email, password});
     const {access_token, refresh_token} = response.data;
-    await Keychain.setGenericPassword('accessToken', access_token);
     await Keychain.setGenericPassword('refreshToken', refresh_token);
     return access_token;
   } catch (error) {
@@ -169,6 +172,8 @@ export {
   add_User,
   update_User,
   remove_User,
+  get_Tools_For_User,
+  get_Materials_For_User,
   login,
   register,
   logout,

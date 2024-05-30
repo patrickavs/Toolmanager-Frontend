@@ -1,8 +1,8 @@
 import {useEffect} from 'react';
-import {useItemsContext} from '../../context/ItemsContext.tsx';
+import {useUserContext} from '../../context/UserContext.tsx';
 
 const useMaterials = () => {
-  const {materials, fetchMaterials} = useItemsContext();
+  const {materials, fetchMaterials} = useUserContext();
 
   useEffect(() => {
     fetchMaterials();

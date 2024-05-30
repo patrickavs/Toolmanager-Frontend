@@ -5,6 +5,7 @@ import Home from './Home.tsx';
 import AuthStackScreen from './AuthStack.tsx';
 import {ItemsProvider} from './context/ItemsContext.tsx';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {UserProvider} from './context/UserContext.tsx';
 
 const AppStack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ const App: React.FC = () => {
     const checkLoginStatus = async () => {
       const credentials = await Keychain.getGenericPassword();
       if (credentials) {
+        console.log(credentials);
         setIsAuthenticated(true);
       }
     };
@@ -38,11 +40,13 @@ const App: React.FC = () => {
   }, [isAuthenticated]);
 
   return (
-    <ItemsProvider>
-      <NavigationContainer>
-        {isAuthenticated ? <Home /> : <AppNavigator />}
-      </NavigationContainer>
-    </ItemsProvider>
+    <UserProvider>
+      <ItemsProvider>
+        <NavigationContainer>
+          {isAuthenticated ? <Home /> : <AppNavigator />}
+        </NavigationContainer>
+      </ItemsProvider>
+    </UserProvider>
   );
 };
 

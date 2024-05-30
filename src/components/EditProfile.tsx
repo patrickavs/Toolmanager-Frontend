@@ -61,7 +61,7 @@ const EditProfile = () => {
 
   const handleSubmit = async () => {
     if (isFormValid) {
-      await update_User(user._id, {
+      await update_User(user.email, {
         ...user,
         name: name,
         email: email,

@@ -1,8 +1,8 @@
 import {useEffect} from 'react';
-import {useItemsContext} from '../../context/ItemsContext.tsx';
+import {useUserContext} from '../../context/UserContext.tsx';
 
 const useTools = () => {
-  const {tools, fetchTools} = useItemsContext();
+  const {tools, fetchTools} = useUserContext();
 
   useEffect(() => {
     fetchTools();

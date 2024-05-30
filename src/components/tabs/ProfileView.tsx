@@ -9,32 +9,31 @@ import {
 import {Avatar, Text, Button, Icon} from 'react-native-elements';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
-import {get_User, logout, remove_User} from '../../service/api';
-import User from '../User';
+import {logout, remove_User} from '../../service/api';
+import {useUserContext} from '../../context/UserContext.tsx';
 
 const ProfileView = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const {user, fetchUser} = useUserContext();
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchUser();
+    getUser();
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      fetchUser();
+      getUser();
     }, []),
   );
 
-  const fetchUser = async () => {
+  const getUser = async () => {
     try {
       const credentials = await Keychain.getGenericPassword();
       console.log(credentials);
       if (credentials) {
-        const fetchedUser = await get_User('me');
-        setUser(fetchedUser);
+        await fetchUser();
       }
     } catch (error) {
       console.error('Failed to fetch user', error);

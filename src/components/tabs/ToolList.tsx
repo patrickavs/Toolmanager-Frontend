@@ -17,6 +17,7 @@ import Material from '../Material.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {useItemsContext} from '../../context/ItemsContext.tsx';
+import {useUserContext} from '../../context/UserContext.tsx';
 import useTools from '../hooks/useTools.ts';
 
 const initialState: Tool = {
@@ -29,7 +30,8 @@ const initialState: Tool = {
 const ToolList = () => {
   const navigation = useNavigation();
   const tools = useTools();
-  const {addTool, deleteTool, fetchTools} = useItemsContext();
+  const {fetchTools} = useUserContext();
+  const {addTool, deleteTool} = useItemsContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newTool, setNewTool] = useState<Tool>(initialState);

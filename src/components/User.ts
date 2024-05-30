@@ -1,3 +1,6 @@
+import Tool from './Tool.ts';
+import Material from './Material.ts';
+
 interface User {
   _id: string;
   name: string;
@@ -6,6 +9,8 @@ interface User {
   profilePic: string;
   aboutMe: string;
   bio: string;
+  tools: Tool[];
+  materials: Material[];
 }
 
 export default User;
