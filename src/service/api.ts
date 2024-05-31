@@ -40,6 +40,8 @@ const refreshAccessToken = async () => {
   } catch (error) {
     console.error('Error refreshing access token:', error);
     await Keychain.resetGenericPassword();
+    await Keychain.resetInternetCredentials('refreshToken');
+    await Keychain.resetInternetCredentials('user');
     return null;
   }
 };
@@ -70,7 +72,7 @@ api.interceptors.response.use(
 
 // Tools
 
-const get_Tools = async () => handleRequest(() => api.get('/tools'));
+const get_Tools = async () => handleRequest(() => api.get('/tools/all'));
 const get_Tool = async (id: string) =>
   handleRequest(() => api.get(`/tools/${id}`));
 const add_Tool = async (tool: Tool) =>
@@ -82,7 +84,7 @@ const remove_Tool = async (toolId: string) =>
 
 // Materials
 
-const get_Materials = async () => handleRequest(() => api.get('/materials'));
+const get_Materials = async () => handleRequest(() => api.get('/materials/all'));
 const get_Material = async (id: string) =>
   handleRequest(() => api.get(`/materials/${id}`));
 const add_Material = async (material: Material) =>
@@ -114,8 +116,13 @@ const login = async (email: string, password: string) => {
   try {
     const response = await api.post('/api/login', {email, password});
     const {access_token, refresh_token} = response.data;
-    await Keychain.setGenericPassword('refreshToken', refresh_token);
-    return access_token;
+    await Keychain.setGenericPassword('accessToken', access_token);
+    await Keychain.setInternetCredentials(
+      'refreshToken',
+      'refreshToken',
+      refresh_token,
+    );
+    //return access_token;
   } catch (error) {
     console.error('Login failed:', error);
     throw error;
@@ -131,14 +138,19 @@ const register = async (name: string, email: string, password: string) => {
   }
 };
 
-const logout = async (token: string) => {
+const logout = async () => {
   try {
-    await api.post('/api/logout', null, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const credentials = await Keychain.getGenericPassword();
+    if (credentials) {
+      await api.post('/api/logout', null, {
+        headers: {
+          Authorization: `Bearer ${credentials.password}`,
+        },
+      });
+    }
     await Keychain.resetGenericPassword();
+    await Keychain.resetInternetCredentials('refreshToken');
+    await Keychain.resetInternetCredentials('user');
   } catch (error) {
     console.error('Error logging out:', error);
     throw error;
@@ -177,4 +189,5 @@ export {
   login,
   register,
   logout,
+  refreshAccessToken,
 };

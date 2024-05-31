@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -7,6 +7,9 @@ import MaterialList from './components/tabs/MaterialList.tsx';
 import DetailView from './components/DetailView.tsx';
 import EditProfile from './components/EditProfile.tsx';
 import ProfileView from './components/tabs/ProfileView.tsx';
+import {useUserContext} from './context/UserContext.tsx';
+import Keychain from 'react-native-keychain';
+import {ItemsProvider} from './context/ItemsContext.tsx';
 
 const ToolStack = createNativeStackNavigator();
 const MaterialStack = createNativeStackNavigator();
@@ -48,30 +51,57 @@ function MaterialStackScreen() {
 const Tab = createBottomTabNavigator();
 
 const Home: React.FC = () => {
-  return (
-    <Tab.Navigator
-      initialRouteName="ToolStack"
-      screenOptions={({route}) => ({
-        tabBarIcon: ({color, focused}) => {
-          let iconName;
+  const {setRegisteredUser} = useUserContext();
 
-          if (route.name === 'ToolStack') {
-            iconName = focused ? 'hammer' : 'hammer-outline';
-          } else if (route.name === 'MaterialStack') {
-            iconName = focused ? 'construct' : 'construct-outline';
-          } else if (route.name === 'UserStack') {
-            iconName = focused ? 'person' : 'person-outline';
+  useEffect(() => {
+    const loadUserFromKeychain = async () => {
+      try {
+        const credentials = await Keychain.getInternetCredentials('user');
+        if (credentials) {
+          const savedUser = JSON.parse(credentials.password);
+          const accessToken = await Keychain.getGenericPassword();
+
+          if (accessToken) {
+            setRegisteredUser(savedUser);
+          } else {
+            await Keychain.resetInternetCredentials('user');
+            await Keychain.resetGenericPassword();
           }
+        }
+      } catch (error) {
+        console.error('Failed to load user from keychain', error);
+      }
+    };
 
-          return <Ionicons name={iconName || ''} color={color} size={30} />;
-        },
-        headerShown: false,
-        tabBarShowLabel: false,
-      })}>
-      <Tab.Screen name="ToolStack" component={ToolStackScreen} />
-      <Tab.Screen name="MaterialStack" component={MaterialStackScreen} />
-      <Tab.Screen name="UserStack" component={UserStackScreen} />
-    </Tab.Navigator>
+    loadUserFromKeychain().then(() => 'successfully load user');
+  }, []);
+
+  return (
+    <ItemsProvider>
+      <Tab.Navigator
+        initialRouteName="ToolStack"
+        screenOptions={({route}) => ({
+          tabBarIcon: ({color, focused}) => {
+            let iconName;
+
+            if (route.name === 'ToolStack') {
+              iconName = focused ? 'hammer' : 'hammer-outline';
+            } else if (route.name === 'MaterialStack') {
+              iconName = focused ? 'construct' : 'construct-outline';
+            } else if (route.name === 'UserStack') {
+              iconName = focused ? 'person' : 'person-outline';
+            }
+
+            return <Ionicons name={iconName || ''} color={color} size={30} />;
+          },
+          headerShown: false,
+          tabBarShowLabel: false,
+        })}>
+        <Tab.Screen name="ToolStack" component={ToolStackScreen} />
+        <Tab.Screen name="MaterialStack" component={MaterialStackScreen} />
+        <Tab.Screen name="UserStack" component={UserStackScreen} />
+      </Tab.Navigator>
+    </ItemsProvider>
   );
 };
 

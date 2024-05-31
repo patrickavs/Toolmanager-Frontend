@@ -1,12 +1,21 @@
-import React, {createContext, ReactNode, useContext, useState} from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useEffect,
+} from 'react';
 import {
   get_Materials_For_User,
   get_Tools_For_User,
   get_User,
+  login,
+  logout,
 } from '../service/api.ts';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
 import User from '../components/User.ts';
+import * as Keychain from 'react-native-keychain';
 
 interface UserContextType {
   user: User | null;
@@ -16,6 +25,8 @@ interface UserContextType {
   materials: Material[];
   fetchTools: () => Promise<void>;
   fetchMaterials: () => Promise<void>;
+  loginUser: (email: string, password: string) => Promise<void>;
+  logoutUser: () => Promise<void>;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(
@@ -27,13 +38,48 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    const loadUserFromKeychain = async () => {
+      try {
+        const credentials = await Keychain.getInternetCredentials('user');
+        if (credentials) {
+          const savedUser = JSON.parse(credentials.password);
+          const accessToken = await Keychain.getGenericPassword();
+
+          if (accessToken) {
+            setUser(savedUser);
+          } else {
+            await Keychain.resetInternetCredentials('user');
+            await Keychain.resetGenericPassword();
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load user from keychain', error);
+      }
+    };
+
+    loadUserFromKeychain();
+  }, []);
+
   const fetchUser = async () => {
     const fetchedUser = await get_User(user?.email || '');
-    setUser(fetchedUser);
+    if (fetchedUser) {
+      setUser(fetchedUser);
+      await Keychain.setInternetCredentials(
+        'user',
+        'user',
+        JSON.stringify(fetchedUser),
+      );
+    }
   };
 
   const setRegisteredUser = async (registeredUser: User) => {
     setUser(registeredUser);
+    await Keychain.setInternetCredentials(
+      'user',
+      'user',
+      JSON.stringify(registeredUser),
+    );
   };
 
   const fetchTools = async () => {
@@ -46,6 +92,26 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
     setMaterials(fetchedMaterials);
   };
 
+  const loginUser = async (email: string, password: string) => {
+    await login(email, password);
+    const fetchedUser = await get_User(email);
+    if (fetchedUser) {
+      setUser(fetchedUser);
+      await Keychain.setInternetCredentials(
+        'user',
+        'user',
+        JSON.stringify(fetchedUser),
+      );
+    }
+  };
+
+  const logoutUser = async () => {
+    await logout();
+    setUser(null);
+    setTools([]);
+    setMaterials([]);
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -56,6 +122,8 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
         materials,
         fetchTools,
         fetchMaterials,
+        loginUser,
+        logoutUser,
       }}>
       {children}
     </UserContext.Provider>
@@ -65,7 +133,7 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
 export const useUserContext = () => {
   const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error('useItems must be used within an ItemsProvider');
+    throw new Error('useUserContext must be used within a UserProvider');
   }
   return context;
 };

@@ -9,11 +9,11 @@ import {
 import {Avatar, Text, Button, Icon} from 'react-native-elements';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
-import {logout, remove_User} from '../../service/api';
+import {remove_User} from '../../service/api';
 import {useUserContext} from '../../context/UserContext.tsx';
 
 const ProfileView = () => {
-  const {user, fetchUser} = useUserContext();
+  const {user, fetchUser, logoutUser} = useUserContext();
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -45,14 +45,9 @@ const ProfileView = () => {
 
   const handleLogout = async () => {
     try {
-      const credentials = await Keychain.getGenericPassword();
-      if (credentials) {
-        const token = credentials.password;
-        await logout(token);
-        await Keychain.resetGenericPassword();
-        //@ts-ignore
-        navigation.navigate('Auth', {screen: 'Login'});
-      }
+      await logoutUser();
+      //@ts-ignore
+      navigation.navigate('Auth', {screen: 'Login'});
     } catch (error) {
       console.error('Logout failed', error);
     }

@@ -9,12 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import * as Keychain from 'react-native-keychain';
-import {get_User, login} from '../../service/api.ts';
 import {useUserContext} from '../../context/UserContext.tsx';
 
 const LoginView: React.FC = () => {
-  const {setRegisteredUser} = useUserContext();
+  const {loginUser} = useUserContext();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -34,10 +32,7 @@ const LoginView: React.FC = () => {
     setLoading(true);
 
     try {
-      const accessToken = await login(email, password);
-      await Keychain.setGenericPassword('accessToken', accessToken);
-      const user = await get_User(email);
-      setRegisteredUser(user);
+      await loginUser(email, password);
       //@ts-ignore
       navigation.navigate('Home');
       resetForm();
