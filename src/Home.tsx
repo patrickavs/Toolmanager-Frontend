@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -7,8 +7,6 @@ import MaterialList from './components/tabs/MaterialList.tsx';
 import DetailView from './components/DetailView.tsx';
 import EditProfile from './components/EditProfile.tsx';
 import ProfileView from './components/tabs/ProfileView.tsx';
-import {useUserContext} from './context/UserContext.tsx';
-import Keychain from 'react-native-keychain';
 import {ItemsProvider} from './context/ItemsContext.tsx';
 
 const ToolStack = createNativeStackNavigator();
@@ -51,33 +49,6 @@ function MaterialStackScreen() {
 const Tab = createBottomTabNavigator();
 
 const Home: React.FC = () => {
-  const {setRegisteredUser} = useUserContext();
-
-  useEffect(() => {
-    const loadUserFromKeychain = async () => {
-      try {
-        const credentials = await Keychain.getInternetCredentials('user');
-        if (credentials) {
-          const savedUser = JSON.parse(credentials.password);
-          const accessToken = await Keychain.getGenericPassword();
-
-          if (accessToken) {
-            setRegisteredUser(savedUser);
-          } else {
-            await Keychain.resetInternetCredentials('user');
-            await Keychain.resetGenericPassword();
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load user from keychain', error);
-      }
-    };
-
-    loadUserFromKeychain().then(() => {
-      console.log('successfully get user from keychain');
-    });
-  }, []);
-
   return (
     <ItemsProvider>
       <Tab.Navigator

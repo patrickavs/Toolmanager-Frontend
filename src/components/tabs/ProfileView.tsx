@@ -52,8 +52,8 @@ const ProfileView = () => {
     }
   };
 
-  const handleRemoveUser = async (id: string) => {
-    await remove_User(id);
+  const handleRemoveUser = async (email: string) => {
+    await remove_User(email);
     //@ts-ignore
     navigation.navigate('Auth', {screen: 'Login'});
   };
@@ -66,8 +66,8 @@ const ProfileView = () => {
     setShowModal(false);
   };
 
-  const proceedDeleteAccount = (id: string) => {
-    handleRemoveUser(id);
+  const proceedDeleteAccount = (email: string) => {
+    handleRemoveUser(email);
     setShowModal(false);
   };
 
@@ -137,7 +137,7 @@ const ProfileView = () => {
               <Button title="Cancel" onPress={cancelDeleteAccount} />
               <Button
                 title="Delete"
-                onPress={() => proceedDeleteAccount(user._id)}
+                onPress={() => proceedDeleteAccount(user?.email)}
                 buttonStyle={{backgroundColor: 'red'}}
               />
             </View>

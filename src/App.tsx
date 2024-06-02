@@ -1,17 +1,43 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useEffect, useRef} from 'react';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
 import Home from './Home.tsx';
 import AuthStackScreen from './AuthStack.tsx';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {UserProvider} from './context/UserContext.tsx';
+import {UserProvider, useUserContext} from './context/UserContext.tsx';
 import {setNavigation} from './service/api.ts';
 
 const AppStack = createNativeStackNavigator();
 
 function AppNavigator() {
+  const navigation = useNavigation();
+  const {setRegisteredUser} = useUserContext();
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const accessToken = await Keychain.getGenericPassword();
+        if (accessToken) {
+          const credentials = await Keychain.getInternetCredentials('user');
+          if (credentials) {
+            const savedUser = JSON.parse(credentials.password);
+            setRegisteredUser(savedUser);
+            //@ts-ignore
+            navigation.navigate('Home');
+          }
+        } else {
+          await Keychain.resetInternetCredentials('user');
+          await Keychain.resetGenericPassword();
+        }
+      } catch (error) {
+        console.error('Failed to load user from keychain', error);
+      }
+    };
+    loadUser().then(() => console.log('Loaded user'));
+  }, []);
+
   return (
-    <AppStack.Navigator initialRouteName="Login">
+    <AppStack.Navigator>
       <AppStack.Screen
         name="Auth"
         component={AuthStackScreen}
@@ -26,18 +52,7 @@ function AppNavigator() {
   );
 }
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigationRef = useRef(null);
-
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const credentials = await Keychain.getGenericPassword();
-      if (credentials) {
-        setIsAuthenticated(true);
-      }
-    };
-    checkLoginStatus();
-  }, []);
 
   useEffect(() => {
     setNavigation(navigationRef.current);
@@ -46,7 +61,7 @@ const App: React.FC = () => {
   return (
     <UserProvider>
       <NavigationContainer ref={navigationRef}>
-        {isAuthenticated ? <Home /> : <AppNavigator />}
+        <AppNavigator />
       </NavigationContainer>
     </UserProvider>
   );

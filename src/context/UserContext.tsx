@@ -41,17 +41,16 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const credentials = await Keychain.getInternetCredentials('user');
-        if (credentials) {
-          const savedUser = JSON.parse(credentials.password);
-          const accessToken = await Keychain.getGenericPassword();
-
-          if (accessToken) {
+        const accessToken = await Keychain.getGenericPassword();
+        if (accessToken) {
+          const credentials = await Keychain.getInternetCredentials('user');
+          if (credentials) {
+            const savedUser = JSON.parse(credentials.password);
             setUser(savedUser);
-          } else {
-            await Keychain.resetInternetCredentials('user');
-            await Keychain.resetGenericPassword();
           }
+        } else {
+          await Keychain.resetInternetCredentials('user');
+          await Keychain.resetGenericPassword();
         }
       } catch (error) {
         console.error('Failed to load user from keychain', error);
@@ -100,7 +99,7 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
       await Keychain.setInternetCredentials(
         'user',
         'user',
-        JSON.stringify(fetchedUser),
+        JSON.stringify(fetchedUser as User),
       );
     }
   };

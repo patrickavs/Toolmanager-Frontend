@@ -3,6 +3,7 @@ import Tool from '../components/Tool';
 import Material from '../components/Material';
 import User from '../components/User';
 import * as Keychain from 'react-native-keychain';
+import {ToastAndroid} from 'react-native';
 
 const BASE_URL = 'http://10.0.2.2:5000';
 
@@ -34,9 +35,14 @@ api.interceptors.response.use(
       if (navigation) {
         navigation.navigate('Login');
       }
-      return Promise.reject(new Error('Session expired. Please log in again.'));
+      //return Promise.reject(new Error('Session expired. Please log in again.'));
+      return ToastAndroid.showWithGravity(
+        'Your Session expired, please sign in again',
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+      );
     }
-    return Promise.reject(error);
+    //return Promise.reject(error);
   },
 );
 
