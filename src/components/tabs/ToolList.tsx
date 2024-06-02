@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   FlatList,
   TextInput,
@@ -15,7 +15,7 @@ import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
 import Material from '../Material.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useItemsContext} from '../../context/ItemsContext.tsx';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useTools from '../hooks/useTools.ts';

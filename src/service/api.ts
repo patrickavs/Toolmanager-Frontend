@@ -10,40 +10,14 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
+let navigation: any;
+
 const setAuthorizationHeader = async (config: any) => {
   const credentials = await Keychain.getGenericPassword();
   if (credentials) {
     config.headers.Authorization = `Bearer ${credentials.password}`;
   }
   return config;
-};
-
-const refreshAccessToken = async () => {
-  try {
-    const credentials = await Keychain.getGenericPassword();
-    if (credentials) {
-      const response = await api.post(
-        '/api/refresh',
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${credentials.password}`,
-          },
-        },
-      );
-      const {access_token} = response.data;
-      await Keychain.setGenericPassword('accessToken', access_token);
-      // Update access token in Axios instance
-      api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
-      return access_token;
-    }
-  } catch (error) {
-    console.error('Error refreshing access token:', error);
-    await Keychain.resetGenericPassword();
-    await Keychain.resetInternetCredentials('refreshToken');
-    await Keychain.resetInternetCredentials('user');
-    return null;
-  }
 };
 
 api.interceptors.request.use(async config => {
@@ -56,19 +30,19 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const newAccessToken = await refreshAccessToken().catch(r =>
-        console.error(r),
-      );
-      if (newAccessToken) {
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalRequest).catch(r => {
-          console.error(r);
-        });
+      await Keychain.resetGenericPassword();
+      if (navigation) {
+        navigation.navigate('Login');
       }
+      return Promise.reject(new Error('Session expired. Please log in again.'));
     }
     return Promise.reject(error);
   },
 );
+
+const setNavigation = (nav: any) => {
+  navigation = nav;
+};
 
 // Tools
 
@@ -84,7 +58,8 @@ const remove_Tool = async (toolId: string) =>
 
 // Materials
 
-const get_Materials = async () => handleRequest(() => api.get('/materials/all'));
+const get_Materials = async () =>
+  handleRequest(() => api.get('/materials/all'));
 const get_Material = async (id: string) =>
   handleRequest(() => api.get(`/materials/${id}`));
 const add_Material = async (material: Material) =>
@@ -106,23 +81,17 @@ const update_User = async (email: string, data: {}) =>
 const remove_User = async (userId: string) =>
   handleRequest(() => api.delete(`users/${userId}`));
 const get_Tools_For_User = async (email: string) =>
-  handleRequest(() => api.get(`/tools/${email}`));
+  handleRequest(() => api.get(`/users/tools/${email}`));
 const get_Materials_For_User = async (email: string) =>
-  handleRequest(() => api.get(`/materials/${email}`));
+  handleRequest(() => api.get(`/users/materials/${email}`));
 
 // Authentication
 
 const login = async (email: string, password: string) => {
   try {
     const response = await api.post('/api/login', {email, password});
-    const {access_token, refresh_token} = response.data;
+    const {access_token} = response.data;
     await Keychain.setGenericPassword('accessToken', access_token);
-    await Keychain.setInternetCredentials(
-      'refreshToken',
-      'refreshToken',
-      refresh_token,
-    );
-    //return access_token;
   } catch (error) {
     console.error('Login failed:', error);
     throw error;
@@ -149,7 +118,6 @@ const logout = async () => {
       });
     }
     await Keychain.resetGenericPassword();
-    await Keychain.resetInternetCredentials('refreshToken');
     await Keychain.resetInternetCredentials('user');
   } catch (error) {
     console.error('Error logging out:', error);
@@ -189,5 +157,5 @@ export {
   login,
   register,
   logout,
-  refreshAccessToken,
+  setNavigation,
 };

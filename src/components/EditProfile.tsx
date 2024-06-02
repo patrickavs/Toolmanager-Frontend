@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import {useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {update_User} from '../service/api.ts';
 
 interface Errors {
@@ -16,6 +16,7 @@ interface Errors {
 }
 
 const EditProfile = () => {
+  const navigation = useNavigation();
   const route = useRoute();
   // @ts-ignore
   const {user} = route.params;
@@ -69,6 +70,7 @@ const EditProfile = () => {
         bio: bio,
       });
       console.log('Form submitted successfully!');
+      navigation.goBack();
     } else {
       console.log('Form has errors. Please correct them.');
     }

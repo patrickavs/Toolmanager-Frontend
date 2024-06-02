@@ -73,7 +73,9 @@ const Home: React.FC = () => {
       }
     };
 
-    loadUserFromKeychain().then(() => 'successfully load user');
+    loadUserFromKeychain().then(() => {
+      console.log('successfully get user from keychain');
+    });
   }, []);
 
   return (

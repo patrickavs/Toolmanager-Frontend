@@ -39,7 +39,7 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const loadUserFromKeychain = async () => {
+    const loadUser = async () => {
       try {
         const credentials = await Keychain.getInternetCredentials('user');
         if (credentials) {
@@ -58,7 +58,7 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
       }
     };
 
-    loadUserFromKeychain();
+    loadUser();
   }, []);
 
   const fetchUser = async () => {

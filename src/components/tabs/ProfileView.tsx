@@ -30,8 +30,7 @@ const ProfileView = () => {
 
   const getUser = async () => {
     try {
-      const credentials = await Keychain.getGenericPassword();
-      console.log(credentials);
+      const credentials = await Keychain.getInternetCredentials('user');
       if (credentials) {
         await fetchUser();
       }

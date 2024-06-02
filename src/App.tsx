@@ -1,16 +1,17 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
 import Home from './Home.tsx';
 import AuthStackScreen from './AuthStack.tsx';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {UserProvider} from './context/UserContext.tsx';
+import {setNavigation} from './service/api.ts';
 
 const AppStack = createNativeStackNavigator();
 
 function AppNavigator() {
   return (
-    <AppStack.Navigator>
+    <AppStack.Navigator initialRouteName="Login">
       <AppStack.Screen
         name="Auth"
         component={AuthStackScreen}
@@ -26,6 +27,7 @@ function AppNavigator() {
 }
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const navigationRef = useRef(null);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -37,9 +39,13 @@ const App: React.FC = () => {
     checkLoginStatus();
   }, []);
 
+  useEffect(() => {
+    setNavigation(navigationRef.current);
+  }, [navigationRef]);
+
   return (
     <UserProvider>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         {isAuthenticated ? <Home /> : <AppNavigator />}
       </NavigationContainer>
     </UserProvider>
