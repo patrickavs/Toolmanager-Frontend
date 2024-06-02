@@ -6,11 +6,19 @@ import React, {
   useEffect,
 } from 'react';
 import {
+  add_Material_To_User,
+  add_Tool_To_User,
   get_Materials_For_User,
   get_Tools_For_User,
+  remove_Tool_From_User,
+  remove_Material_From_User,
   get_User,
   login,
   logout,
+  add_Tool,
+  add_Material,
+  remove_Tool,
+  remove_Material,
 } from '../service/api.ts';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
@@ -23,8 +31,12 @@ interface UserContextType {
   setRegisteredUser: (user: User) => void;
   tools: Tool[];
   materials: Material[];
-  fetchTools: () => Promise<void>;
-  fetchMaterials: () => Promise<void>;
+  fetchToolsFromUser: () => Promise<void>;
+  fetchMaterialsFromUser: () => Promise<void>;
+  addToolToUser: (newTool: Tool) => Promise<void>;
+  addMaterialToUser: (newMaterial: Material) => Promise<void>;
+  deleteToolFromUser: (id: string) => Promise<void>;
+  deleteMaterialFromUser: (id: string) => Promise<void>;
   loginUser: (email: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
 }
@@ -81,14 +93,40 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
     );
   };
 
-  const fetchTools = async () => {
+  const fetchToolsFromUser = async () => {
     const fetchedTools = await get_Tools_For_User(user?.email || '');
     setTools(fetchedTools);
   };
 
-  const fetchMaterials = async () => {
+  const fetchMaterialsFromUser = async () => {
     const fetchedMaterials = await get_Materials_For_User(user?.email || '');
     setMaterials(fetchedMaterials);
+  };
+
+  const addToolToUser = async (tool: Tool) => {
+    const _id = tool._id;
+    await add_Tool_To_User(user?.email || '', {_id});
+    await add_Tool(tool);
+    await fetchToolsFromUser();
+  };
+
+  const addMaterialToUser = async (material: Material) => {
+    const _id = material._id;
+    await add_Material_To_User(user?.email || '', {_id});
+    await add_Material(material);
+    await fetchMaterialsFromUser();
+  };
+
+  const deleteToolFromUser = async (id: string) => {
+    await remove_Tool_From_User(user?.email || '', id);
+    await remove_Tool(id);
+    await fetchToolsFromUser();
+  };
+
+  const deleteMaterialFromUser = async (id: string) => {
+    await remove_Material_From_User(user?.email || '', id);
+    await remove_Material(id);
+    await fetchMaterialsFromUser();
   };
 
   const loginUser = async (email: string, password: string) => {
@@ -119,8 +157,12 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
         setRegisteredUser,
         tools,
         materials,
-        fetchTools,
-        fetchMaterials,
+        fetchToolsFromUser: fetchToolsFromUser,
+        fetchMaterialsFromUser: fetchMaterialsFromUser,
+        addToolToUser,
+        addMaterialToUser,
+        deleteToolFromUser,
+        deleteMaterialFromUser,
         loginUser,
         logoutUser,
       }}>

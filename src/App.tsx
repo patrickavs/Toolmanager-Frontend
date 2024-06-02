@@ -20,6 +20,7 @@ function AppNavigator() {
         if (accessToken) {
           const credentials = await Keychain.getInternetCredentials('user');
           if (credentials) {
+            console.log('loaded User');
             const savedUser = JSON.parse(credentials.password);
             setRegisteredUser(savedUser);
             //@ts-ignore
@@ -33,7 +34,7 @@ function AppNavigator() {
         console.error('Failed to load user from keychain', error);
       }
     };
-    loadUser().then(() => console.log('Loaded user'));
+    loadUser();
   }, []);
 
   return (

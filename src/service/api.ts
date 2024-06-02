@@ -87,9 +87,17 @@ const update_User = async (email: string, data: {}) =>
 const remove_User = async (userId: string) =>
   handleRequest(() => api.delete(`users/${userId}`));
 const get_Tools_For_User = async (email: string) =>
-  handleRequest(() => api.get(`/users/tools/${email}`));
+  handleRequest(() => api.get(`/users/${email}/tools`));
 const get_Materials_For_User = async (email: string) =>
-  handleRequest(() => api.get(`/users/materials/${email}`));
+  handleRequest(() => api.get(`/users/${email}/materials`));
+const add_Tool_To_User = async (email: string, data: {}) =>
+  handleRequest(() => api.post(`/users/${email}/tools`, data));
+const remove_Tool_From_User = async (email: string, toolId: string) =>
+  handleRequest(() => api.delete(`/users/${email}/tools/${toolId}`));
+const add_Material_To_User = async (email: string, data: {}) =>
+  handleRequest(() => api.post(`/users/${email}/materials`, data));
+const remove_Material_From_User = async (email: string, materialId: string) =>
+  handleRequest(() => api.delete(`/users/${email}/materials/${materialId}`));
 
 // Authentication
 
@@ -160,6 +168,10 @@ export {
   remove_User,
   get_Tools_For_User,
   get_Materials_For_User,
+  add_Tool_To_User,
+  remove_Tool_From_User,
+  add_Material_To_User,
+  remove_Material_From_User,
   login,
   register,
   logout,

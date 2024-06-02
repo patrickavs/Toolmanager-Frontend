@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   FlatList,
   TextInput,
@@ -15,8 +15,7 @@ import {CustomFAB} from '../CustomFAB.tsx';
 import {CustomModal} from '../CustomModal.tsx';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Tool from '../Tool.ts';
-import {useNavigation} from '@react-navigation/native';
-import {useItemsContext} from '../../context/ItemsContext.tsx';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useMaterials from '../hooks/useMaterials.ts';
 
@@ -30,21 +29,27 @@ const initialState: Material = {
 const MaterialList = () => {
   const navigation = useNavigation();
   const materials = useMaterials();
-  const {fetchMaterials} = useUserContext();
-  const {addMaterial, deleteMaterial} = useItemsContext();
+  const {fetchMaterialsFromUser} = useUserContext();
+  const {addMaterialToUser, deleteMaterialFromUser} = useUserContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(initialState);
   const [toolInputs, setToolInputs] = useState<Tool[]>([]);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchMaterialsFromUser();
+    }, []),
+  );
+
   const onRefresh = () => {
     setRefreshing(true);
-    fetchMaterials().then(() => setRefreshing(false));
+    fetchMaterialsFromUser().then(() => setRefreshing(false));
   };
 
   const handleAddMaterial = async () => {
     try {
-      await addMaterial(newMaterial);
+      await addMaterialToUser(newMaterial);
       setIsAddItemModalVisible(false);
       setNewMaterial(initialState);
       setToolInputs([]);
@@ -55,7 +60,7 @@ const MaterialList = () => {
 
   const handleDeleteMaterial = async (id: string) => {
     try {
-      await deleteMaterial(id);
+      await deleteMaterialFromUser(id);
     } catch (error) {
       console.error('Error deleting material:', error);
     }

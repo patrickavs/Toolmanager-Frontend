@@ -16,7 +16,6 @@ import {CustomModal} from '../CustomModal.tsx';
 import Material from '../Material.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {useItemsContext} from '../../context/ItemsContext.tsx';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useTools from '../hooks/useTools.ts';
 
@@ -30,21 +29,27 @@ const initialState: Tool = {
 const ToolList = () => {
   const navigation = useNavigation();
   const tools = useTools();
-  const {fetchTools} = useUserContext();
-  const {addTool, deleteTool} = useItemsContext();
+  const {fetchToolsFromUser, addToolToUser, deleteToolFromUser} =
+    useUserContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newTool, setNewTool] = useState<Tool>(initialState);
   const [materialInputs, setMaterialInputs] = useState<Material[]>([]);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchToolsFromUser();
+    }, []),
+  );
+
   const onRefresh = () => {
     setRefreshing(true);
-    fetchTools().then(() => setRefreshing(false));
+    fetchToolsFromUser().then(() => setRefreshing(false));
   };
 
   const handleAddTool = async () => {
     try {
-      await addTool(newTool);
+      await addToolToUser(newTool);
       setIsAddItemModalVisible(false);
       setNewTool(initialState);
       setMaterialInputs([]);
@@ -55,7 +60,7 @@ const ToolList = () => {
 
   const handleDeleteTool = async (id: string) => {
     try {
-      await deleteTool(id);
+      await deleteToolFromUser(id);
     } catch (error) {
       console.error('Error deleting tool:', error);
     }

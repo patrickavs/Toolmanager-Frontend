@@ -8,7 +8,7 @@ export function CustomFAB({action}: {action: () => void}) {
       <Ionicon name="add" size={30} color="white" />
     </TouchableOpacity>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
