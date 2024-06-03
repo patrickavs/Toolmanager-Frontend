@@ -30,7 +30,8 @@ const MaterialList = () => {
   const navigation = useNavigation();
   const materials = useMaterials();
   const {fetchMaterialsFromUser} = useUserContext();
-  const {addMaterialToUser, deleteMaterialFromUser} = useUserContext();
+  const {addMaterialToUser, deleteMaterialFromUser, addToolToUser} =
+    useUserContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(initialState);
@@ -50,6 +51,9 @@ const MaterialList = () => {
   const handleAddMaterial = async () => {
     try {
       await addMaterialToUser(newMaterial);
+      for (const tool of toolInputs) {
+        await addToolToUser(tool);
+      }
       setIsAddItemModalVisible(false);
       setNewMaterial(initialState);
       setToolInputs([]);
