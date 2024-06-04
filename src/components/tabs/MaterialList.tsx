@@ -19,33 +19,37 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useMaterials from '../hooks/useMaterials.ts';
 
-const initialState: Material = {
+const getInitialState = () => ({
   _id: ObjectID().toHexString(),
   name: '',
   description: '',
   tools: [],
-};
+});
 
 const MaterialList = () => {
   const navigation = useNavigation();
   const materials = useMaterials();
   const {fetchMaterialsFromUser} = useUserContext();
-  const {addMaterialToUser, deleteMaterialFromUser, addToolToUser} =
+  const {addMaterialToUser, deleteMaterialFromUser, addToolToUser, user} =
     useUserContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
-  const [newMaterial, setNewMaterial] = useState<Material>(initialState);
+  const [newMaterial, setNewMaterial] = useState<Material>(getInitialState());
   const [toolInputs, setToolInputs] = useState<Tool[]>([]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchMaterialsFromUser();
+      const fetchData = async () => {
+        await fetchMaterialsFromUser();
+      };
+      fetchData();
     }, []),
   );
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    fetchMaterialsFromUser().then(() => setRefreshing(false));
+    await fetchMaterialsFromUser();
+    setRefreshing(false);
   };
 
   const handleAddMaterial = async () => {
@@ -54,8 +58,14 @@ const MaterialList = () => {
       for (const tool of toolInputs) {
         await addToolToUser(tool);
       }
+      for (const material of user?.materials || []) {
+        if (material.name === newMaterial.name) {
+          // TODO: show modal that another material with the same name is already in the list
+          return;
+        }
+      }
+      setNewMaterial(getInitialState());
       setIsAddItemModalVisible(false);
-      setNewMaterial(initialState);
       setToolInputs([]);
     } catch (error) {
       console.error('Error adding material:', error);

@@ -13,12 +13,14 @@ import Tool from './Tool.ts';
 import Material from './Material.ts';
 import ObjectID from 'bson-objectid';
 import {useItemsContext} from '../context/ItemsContext.tsx';
+import {useUserContext} from '../context/UserContext.tsx';
 
 const DetailView = ({route}: {route: any}) => {
   const navigation = useNavigation();
   const {item, type} = route.params;
   const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} =
     useItemsContext();
+  const {addMaterialToUser, addToolToUser} = useUserContext();
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
   const [inputs, setInputs] = useState(
@@ -33,6 +35,17 @@ const DetailView = ({route}: {route: any}) => {
     setIsEditing(false);
     if (type === 'Tool') {
       await modifyTool(item._id, editedItem);
+      if (inputs.length > 0) {
+        if (type === 'Tool') {
+          for (const material of inputs) {
+            await addMaterialToUser(material);
+          }
+        } else {
+          for (const tool of inputs) {
+            await addToolToUser(tool);
+          }
+        }
+      }
       setEditedItem(await fetchTool(item._id));
     } else if (type === 'Material') {
       await modifyMaterial(item._id, editedItem);
@@ -56,11 +69,22 @@ const DetailView = ({route}: {route: any}) => {
   };
 
   const addItemInput = () => {
-    const newItem = {
-      _id: ObjectID().toHexString(),
-      name: '',
-      description: '',
-    };
+    let newItem;
+    if (type === 'Tool') {
+      newItem = {
+        _id: ObjectID().toHexString(),
+        name: '',
+        materials: [editedItem._id],
+        description: '',
+      };
+    } else {
+      newItem = {
+        _id: ObjectID().toHexString(),
+        name: '',
+        tools: [editedItem._id],
+        description: '',
+      };
+    }
     setInputs([...inputs, newItem]);
   };
 

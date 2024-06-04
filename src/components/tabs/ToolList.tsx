@@ -19,12 +19,12 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useTools from '../hooks/useTools.ts';
 
-const initialState: Tool = {
+const getInitialState = () => ({
   _id: ObjectID().toHexString(),
   name: '',
   description: '',
   materials: [],
-};
+});
 
 const ToolList = () => {
   const navigation = useNavigation();
@@ -37,18 +37,22 @@ const ToolList = () => {
   } = useUserContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
-  const [newTool, setNewTool] = useState<Tool>(initialState);
+  const [newTool, setNewTool] = useState<Tool>(getInitialState());
   const [materialInputs, setMaterialInputs] = useState<Material[]>([]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchToolsFromUser();
+      const fetchData = async () => {
+        await fetchToolsFromUser();
+      };
+      fetchData();
     }, []),
   );
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    fetchToolsFromUser().then(() => setRefreshing(false));
+    await fetchToolsFromUser();
+    setRefreshing(false);
   };
 
   const handleAddTool = async () => {
@@ -57,8 +61,8 @@ const ToolList = () => {
       for (const material of materialInputs) {
         await addMaterialToUser(material);
       }
+      setNewTool(getInitialState());
       setIsAddItemModalVisible(false);
-      setNewTool(initialState);
       setMaterialInputs([]);
     } catch (error) {
       console.error('Error adding tool:', error);
