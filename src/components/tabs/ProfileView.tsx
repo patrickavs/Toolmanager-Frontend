@@ -19,12 +19,12 @@ const ProfileView = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
-    getUser();
+    getUser().then(() => console.log('successfully fetched user'));
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      getUser();
+      getUser().then(() => console.log('successfully fetched user'));
     }, []),
   );
 
@@ -35,7 +35,7 @@ const ProfileView = () => {
         await fetchUser();
       }
     } catch (error) {
-      console.error('Failed to fetch user', error);
+      console.log('Failed to fetch user. Possibly invalid token', error);
       setLoading(false);
     } finally {
       setLoading(false);
@@ -66,8 +66,8 @@ const ProfileView = () => {
     setShowModal(false);
   };
 
-  const proceedDeleteAccount = (email: string) => {
-    handleRemoveUser(email);
+  const proceedDeleteAccount = async (email: string) => {
+    await handleRemoveUser(email);
     setShowModal(false);
   };
 
@@ -138,7 +138,7 @@ const ProfileView = () => {
               <Button
                 title="Delete"
                 onPress={() => proceedDeleteAccount(user?.email)}
-                buttonStyle={{backgroundColor: 'red'}}
+                buttonStyle={styles.deleteButton}
               />
             </View>
           </View>

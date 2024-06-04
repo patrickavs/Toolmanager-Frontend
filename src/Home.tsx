@@ -17,7 +17,7 @@ function UserStackScreen() {
   return (
     <UserStack.Navigator
       initialRouteName="Profile"
-      screenOptions={{headerStyle: {backgroundColor: 'orange'}}}>
+      screenOptions={{headerStyle: {backgroundColor: '#63b0f4'}}}>
       <UserStack.Screen name="Profile" component={ProfileView} />
       <UserStack.Screen name="Edit" component={EditProfile} />
     </UserStack.Navigator>
@@ -28,7 +28,7 @@ function ToolStackScreen() {
   return (
     <ToolStack.Navigator
       initialRouteName="Tools"
-      screenOptions={{headerStyle: {backgroundColor: 'orange'}}}>
+      screenOptions={{headerStyle: {backgroundColor: '#63b0f4'}}}>
       <ToolStack.Screen name="Tools" component={ToolList} />
       <ToolStack.Screen name="DetailView" component={DetailView} />
     </ToolStack.Navigator>
@@ -39,7 +39,7 @@ function MaterialStackScreen() {
   return (
     <MaterialStack.Navigator
       initialRouteName="Materials"
-      screenOptions={{headerStyle: {backgroundColor: 'orange'}}}>
+      screenOptions={{headerStyle: {backgroundColor: '#63b0f4'}}}>
       <MaterialStack.Screen name="Materials" component={MaterialList} />
       <MaterialStack.Screen name="DetailView" component={DetailView} />
     </MaterialStack.Navigator>

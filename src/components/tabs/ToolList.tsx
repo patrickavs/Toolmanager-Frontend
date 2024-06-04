@@ -7,6 +7,7 @@ import {
   Text,
   Button,
   TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
@@ -45,7 +46,7 @@ const ToolList = () => {
       const fetchData = async () => {
         await fetchToolsFromUser();
       };
-      fetchData();
+      fetchData().then(() => console.log('successfully fetched tools'));
     }, []),
   );
 
@@ -55,6 +56,7 @@ const ToolList = () => {
     setRefreshing(false);
   };
 
+  // TODO: show modal that another tool with the same name is already in the list
   const handleAddTool = async () => {
     try {
       await addToolToUser(newTool);
@@ -158,13 +160,13 @@ const ToolList = () => {
   };
 
   const renderTool = ({item}: {item: Tool}) => (
-    <TouchableOpacity
+    <Pressable
       onPress={() =>
         //@ts-ignore
         navigation.navigate('DetailView', {item: item, type: 'Tool'})
       }>
       <ListItem key={item._id} item={item} onDeleteItem={handleDeleteTool} />
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (

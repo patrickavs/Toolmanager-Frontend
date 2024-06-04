@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Button,
+  Pressable,
 } from 'react-native';
 import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
@@ -42,7 +43,7 @@ const MaterialList = () => {
       const fetchData = async () => {
         await fetchMaterialsFromUser();
       };
-      fetchData();
+      fetchData().then(() => console.log('successfully fetched materials'));
     }, []),
   );
 
@@ -52,17 +53,12 @@ const MaterialList = () => {
     setRefreshing(false);
   };
 
+  // TODO: show modal that another material with the same name is already in the list
   const handleAddMaterial = async () => {
     try {
       await addMaterialToUser(newMaterial);
       for (const tool of toolInputs) {
         await addToolToUser(tool);
-      }
-      for (const material of user?.materials || []) {
-        if (material.name === newMaterial.name) {
-          // TODO: show modal that another material with the same name is already in the list
-          return;
-        }
       }
       setNewMaterial(getInitialState());
       setIsAddItemModalVisible(false);
@@ -155,7 +151,7 @@ const MaterialList = () => {
   };
 
   const renderMaterial = ({item}: {item: Material}) => (
-    <TouchableOpacity
+    <Pressable
       onPress={() =>
         //@ts-ignore
         navigation.navigate('DetailView', {item: item, type: 'Material'})
@@ -165,7 +161,7 @@ const MaterialList = () => {
         item={item}
         onDeleteItem={handleDeleteMaterial}
       />
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (

@@ -14,13 +14,14 @@ import Material from './Material.ts';
 import ObjectID from 'bson-objectid';
 import {useItemsContext} from '../context/ItemsContext.tsx';
 import {useUserContext} from '../context/UserContext.tsx';
+import {get_Materials_For_User, get_Tools_For_User} from '../service/api.ts';
 
 const DetailView = ({route}: {route: any}) => {
   const navigation = useNavigation();
   const {item, type} = route.params;
   const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} =
     useItemsContext();
-  const {addMaterialToUser, addToolToUser} = useUserContext();
+  const {addMaterialToUser, addToolToUser, user} = useUserContext();
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
   const [inputs, setInputs] = useState(
@@ -33,25 +34,55 @@ const DetailView = ({route}: {route: any}) => {
 
   const handleSave = async () => {
     setIsEditing(false);
-    if (type === 'Tool') {
-      await modifyTool(item._id, editedItem);
-      if (inputs.length > 0) {
-        if (type === 'Tool') {
-          for (const material of inputs) {
-            await addMaterialToUser(material);
-          }
-        } else {
-          for (const tool of inputs) {
-            await addToolToUser(tool);
+
+    try {
+      if (type === 'Tool') {
+        await modifyTool(item._id, editedItem);
+
+        if (inputs.length > 0) {
+          const materials: Material[] = await get_Materials_For_User(
+            user?.email || '',
+          );
+
+          for (const material of inputs as Material[]) {
+            const materialExists = materials.some(
+              materialListMaterial =>
+                material.name === materialListMaterial.name,
+            );
+
+            if (!materialExists) {
+              await addMaterialToUser(material);
+            }
           }
         }
+
+        const updatedTool = await fetchTool(item._id);
+        setEditedItem(updatedTool);
+      } else if (type === 'Material') {
+        await modifyMaterial(item._id, editedItem);
+
+        if (inputs.length > 0) {
+          const tools: Tool[] = await get_Tools_For_User(user?.email || '');
+
+          for (const tool of inputs as Tool[]) {
+            const toolExists = tools.some(
+              toolListTool => tool.name === toolListTool.name,
+            );
+
+            if (!toolExists) {
+              await addToolToUser(tool);
+            }
+          }
+        }
+
+        const updatedMaterial = await fetchMaterial(item._id);
+        setEditedItem(updatedMaterial);
       }
-      setEditedItem(await fetchTool(item._id));
-    } else if (type === 'Material') {
-      await modifyMaterial(item._id, editedItem);
-      setEditedItem(await fetchMaterial(item._id));
+
+      console.log('Updated item:', editedItem);
+    } catch (error) {
+      console.error('Error saving item:', error);
     }
-    console.log('Updated item:', editedItem);
   };
 
   const handleInputChange = (name: string, value: string) => {
