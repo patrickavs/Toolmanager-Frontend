@@ -222,7 +222,7 @@ const MaterialList = () => {
       <View style={styles.filterContainer}>
         <TextInput
           style={styles.filterInput}
-          placeholder="Filter tools..."
+          placeholder="Filter materials..."
           onChangeText={text => setFilterValue(text)}
           value={filterValue}
         />
