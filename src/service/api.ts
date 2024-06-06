@@ -37,7 +37,7 @@ api.interceptors.response.use(
       }
       //return Promise.reject(new Error('Session expired. Please log in again.'));
       return ToastAndroid.showWithGravity(
-        'Your Session expired, please sign in again',
+        'Session expired. Please sign in again',
         ToastAndroid.SHORT,
         ToastAndroid.TOP,
       );

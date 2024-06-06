@@ -8,7 +8,7 @@ import {
   TextInput,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import Tool from './Tool.ts';
 import Material from './Material.ts';
 import ObjectID from 'bson-objectid';
@@ -16,7 +16,8 @@ import {useItemsContext} from '../context/ItemsContext.tsx';
 import {useUserContext} from '../context/UserContext.tsx';
 import {get_Materials_For_User, get_Tools_For_User} from '../service/api.ts';
 
-const DetailView = ({route}: {route: any}) => {
+const DetailView = () => {
+  const route = useRoute<any>();
   const navigation = useNavigation();
   const {item, type} = route.params;
   const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} =

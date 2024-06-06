@@ -17,8 +17,7 @@ interface Errors {
 
 const EditProfile = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  // @ts-ignore
+  const route = useRoute<any>();
   const {user} = route.params;
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');

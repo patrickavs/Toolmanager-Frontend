@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
   FlatList,
   TextInput,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Button,
   Pressable,
+  ToastAndroid,
 } from 'react-native';
 import ListItem from '../ListItemView.tsx';
 import Material from '../Material.ts';
@@ -31,12 +32,13 @@ const MaterialList = () => {
   const navigation = useNavigation();
   const materials = useMaterials();
   const {fetchMaterialsFromUser} = useUserContext();
-  const {addMaterialToUser, deleteMaterialFromUser, addToolToUser, user} =
+  const {addMaterialToUser, deleteMaterialFromUser, addToolToUser, tools} =
     useUserContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(getInitialState());
   const [toolInputs, setToolInputs] = useState<Tool[]>([]);
+  const [filterValue, setFilterValue] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -53,13 +55,49 @@ const MaterialList = () => {
     setRefreshing(false);
   };
 
-  // TODO: show modal that another material with the same name is already in the list
+  const showDuplicateMaterialToast = () => {
+    ToastAndroid.showWithGravity(
+      'A material with the same name already exists.',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+  };
+
+  const showDuplicateToolToast = () => {
+    ToastAndroid.showWithGravity(
+      'A material with the same name already exists.',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+  };
+
+  const checkIfToolExists = async (name: string) => {
+    return tools.some(tool => tool.name === name);
+  };
+
   const handleAddMaterial = async () => {
     try {
+      // TODO: Set the _id of the tool matched with the name
+      for (const tool of toolInputs) {
+        const toolExists = await checkIfToolExists(tool.name);
+        if (toolExists) {
+          showDuplicateToolToast();
+          return;
+        }
+      }
+
+      for (const material of materials) {
+        if (material.name === newMaterial.name) {
+          showDuplicateMaterialToast();
+          return;
+        }
+      }
+
       await addMaterialToUser(newMaterial);
       for (const tool of toolInputs) {
         await addToolToUser(tool);
       }
+
       setNewMaterial(getInitialState());
       setIsAddItemModalVisible(false);
       setToolInputs([]);
@@ -150,6 +188,21 @@ const MaterialList = () => {
     );
   };
 
+  const filterMaterials = useCallback(
+    (materials: Material[], filterValue: string) => {
+      return materials.filter(material =>
+        material.name.toLowerCase().includes(filterValue.toLowerCase()),
+      );
+    },
+    [],
+  );
+
+  // probably adding sorting
+
+  const filteredMaterials = useMemo(() => {
+    return filterMaterials(materials, filterValue);
+  }, [materials, filterValue, filterMaterials]);
+
   const renderMaterial = ({item}: {item: Material}) => (
     <Pressable
       onPress={() =>
@@ -166,8 +219,16 @@ const MaterialList = () => {
 
   return (
     <>
+      <View style={styles.filterContainer}>
+        <TextInput
+          style={styles.filterInput}
+          placeholder="Filter tools..."
+          onChangeText={text => setFilterValue(text)}
+          value={filterValue}
+        />
+      </View>
       <FlatList
-        data={materials}
+        data={filteredMaterials}
         renderItem={renderMaterial}
         onRefresh={onRefresh}
         refreshing={refreshing}
@@ -234,6 +295,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    paddingTop: 20,
+  },
+  filterInput: {
+    flex: 1,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    borderColor: '#ccc',
   },
 });
 

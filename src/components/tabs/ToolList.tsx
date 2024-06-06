@@ -1,13 +1,14 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
+  Button,
   FlatList,
-  TextInput,
-  View,
+  Pressable,
   StyleSheet,
   Text,
-  Button,
+  TextInput,
+  ToastAndroid,
   TouchableOpacity,
-  Pressable,
+  View,
 } from 'react-native';
 import ListItem from '../ListItemView.tsx';
 import Tool from '../Tool.ts';
@@ -35,11 +36,14 @@ const ToolList = () => {
     addToolToUser,
     deleteToolFromUser,
     addMaterialToUser,
+    materials,
   } = useUserContext();
+
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newTool, setNewTool] = useState<Tool>(getInitialState());
   const [materialInputs, setMaterialInputs] = useState<Material[]>([]);
+  const [filterValue, setFilterValue] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -56,9 +60,43 @@ const ToolList = () => {
     setRefreshing(false);
   };
 
-  // TODO: show modal that another tool with the same name is already in the list
+  const showDuplicateMaterialToast = () => {
+    ToastAndroid.showWithGravity(
+      'A material with the same name already exists.',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+  };
+
+  const showDuplicateToolToast = () => {
+    ToastAndroid.showWithGravity(
+      'A tool with the same name already exists.',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+  };
+
+  const checkIfMaterialExists = async (name: string) => {
+    return materials.some(material => material.name === name);
+  };
+
   const handleAddTool = async () => {
     try {
+      for (const material of materialInputs) {
+        const materialExists = await checkIfMaterialExists(material.name);
+        if (materialExists) {
+          showDuplicateMaterialToast();
+          return;
+        }
+      }
+
+      for (const tool of tools) {
+        if (tool.name === newTool.name) {
+          showDuplicateToolToast();
+          return;
+        }
+      }
+
       await addToolToUser(newTool);
       for (const material of materialInputs) {
         await addMaterialToUser(material);
@@ -108,9 +146,7 @@ const ToolList = () => {
   };
 
   const removeMaterialInput = (index: number) => {
-    const updatedMaterials = materialInputs.filter(
-      (_: Material, i: number) => i !== index,
-    );
+    const updatedMaterials = materialInputs.filter((_, i) => i !== index);
     setMaterialInputs(updatedMaterials);
     setNewTool({...newTool, materials: updatedMaterials});
   };
@@ -159,6 +195,18 @@ const ToolList = () => {
     );
   };
 
+  const filterTools = useCallback((tools: Tool[], filterValue: string) => {
+    return tools.filter(tool =>
+      tool.name.toLowerCase().includes(filterValue.toLowerCase()),
+    );
+  }, []);
+
+  // probably adding sorting
+
+  const filteredTools = useMemo(() => {
+    return filterTools(tools, filterValue);
+  }, [tools, filterValue, filterTools]);
+
   const renderTool = ({item}: {item: Tool}) => (
     <Pressable
       onPress={() =>
@@ -171,8 +219,16 @@ const ToolList = () => {
 
   return (
     <>
+      <View style={styles.filterContainer}>
+        <TextInput
+          style={styles.filterInput}
+          placeholder="Filter tools..."
+          onChangeText={text => setFilterValue(text)}
+          value={filterValue}
+        />
+      </View>
       <FlatList
-        data={tools}
+        data={filteredTools}
         renderItem={renderTool}
         onRefresh={onRefresh}
         refreshing={refreshing}
@@ -222,10 +278,12 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderWidth: 1,
-    padding: 5,
+    padding: 10,
     marginVertical: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     flexGrow: 1,
+    backgroundColor: 'white',
+    borderColor: '#ccc',
   },
   materialTitle: {
     fontSize: 17,
@@ -239,6 +297,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    paddingTop: 20,
+  },
+  filterInput: {
+    flex: 1,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    borderColor: '#ccc',
   },
 });
 
