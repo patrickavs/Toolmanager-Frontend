@@ -1,4 +1,11 @@
-import {Button, Modal, StyleSheet, Text, View} from 'react-native';
+import {
+  Button,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import React from 'react';
 
 interface CustomModalProps {
@@ -8,6 +15,7 @@ interface CustomModalProps {
   modalVisible: boolean;
   buttonPressAction: () => void;
   deleteAction: boolean;
+  buttonDisabled: boolean;
 }
 
 export const CustomModal: React.FC<CustomModalProps> = ({
@@ -17,6 +25,7 @@ export const CustomModal: React.FC<CustomModalProps> = ({
   modalVisible,
   buttonPressAction,
   deleteAction,
+  buttonDisabled = false,
 }) => {
   return (
     <Modal
@@ -37,7 +46,11 @@ export const CustomModal: React.FC<CustomModalProps> = ({
                 onPress={buttonPressAction}
               />
             ) : (
-              <Button title="Save" onPress={buttonPressAction} />
+              <Button
+                title="Save"
+                onPress={buttonPressAction}
+                disabled={buttonDisabled}
+              />
             )}
           </View>
         </View>
@@ -58,6 +71,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 30,
     width: '80%',
+    marginBottom: 100,
   },
   modalTitle: {
     fontSize: 18,

@@ -247,6 +247,7 @@ const MaterialList = () => {
         modalVisible={isAddItemModalVisible}
         buttonPressAction={handleAddMaterial}
         deleteAction={false}
+        buttonDisabled={newMaterial.name === ''}
       />
     </>
   );

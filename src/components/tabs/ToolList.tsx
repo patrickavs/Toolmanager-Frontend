@@ -247,6 +247,7 @@ const ToolList = () => {
         modalVisible={isAddItemModalVisible}
         buttonPressAction={handleAddTool}
         deleteAction={false}
+        buttonDisabled={newTool.name === ''}
       />
     </>
   );
