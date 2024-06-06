@@ -278,10 +278,12 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderWidth: 1,
-    padding: 5,
+    padding: 10,
     marginVertical: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     flexGrow: 1,
+    backgroundColor: 'white',
+    borderColor: '#ccc',
   },
   toolTitle: {
     fontSize: 17,
