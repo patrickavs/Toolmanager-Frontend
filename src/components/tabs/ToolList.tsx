@@ -60,14 +60,6 @@ const ToolList = () => {
     setRefreshing(false);
   };
 
-  const showDuplicateMaterialToast = () => {
-    ToastAndroid.showWithGravity(
-      'A material with the same name already exists.',
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER,
-    );
-  };
-
   const showDuplicateToolToast = () => {
     ToastAndroid.showWithGravity(
       'A tool with the same name already exists.',
@@ -82,13 +74,21 @@ const ToolList = () => {
 
   const handleAddTool = async () => {
     try {
+      const materialIds: string[] = [];
       for (const material of materialInputs) {
         const materialExists = await checkIfMaterialExists(material.name);
         if (materialExists) {
-          showDuplicateMaterialToast();
           return;
+        } else {
+          await addMaterialToUser(material);
+          materialIds.push(material._id);
         }
       }
+
+      const newToolWithIds = {
+        ...newTool,
+        materials: materialIds,
+      };
 
       for (const tool of tools) {
         if (tool.name === newTool.name) {
@@ -97,10 +97,7 @@ const ToolList = () => {
         }
       }
 
-      await addToolToUser(newTool);
-      for (const material of materialInputs) {
-        await addMaterialToUser(material);
-      }
+      await addToolToUser(newToolWithIds);
       setNewTool(getInitialState());
       setIsAddItemModalVisible(false);
       setMaterialInputs([]);
@@ -128,7 +125,7 @@ const ToolList = () => {
       setMaterialInputs(updatedMaterials);
       setNewTool({
         ...newTool,
-        materials: updatedMaterials,
+        materials: updatedMaterials.map(material => material._id),
       });
     } else {
       setNewTool({...newTool, [name]: value});
@@ -148,7 +145,10 @@ const ToolList = () => {
   const removeMaterialInput = (index: number) => {
     const updatedMaterials = materialInputs.filter((_, i) => i !== index);
     setMaterialInputs(updatedMaterials);
-    setNewTool({...newTool, materials: updatedMaterials});
+    setNewTool({
+      ...newTool,
+      materials: updatedMaterials.map(material => material._id),
+    });
   };
 
   const renderModalFields = () => {

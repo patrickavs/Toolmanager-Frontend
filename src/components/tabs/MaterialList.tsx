@@ -63,28 +63,27 @@ const MaterialList = () => {
     );
   };
 
-  const showDuplicateToolToast = () => {
-    ToastAndroid.showWithGravity(
-      'A material with the same name already exists.',
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER,
-    );
-  };
-
   const checkIfToolExists = async (name: string) => {
     return tools.some(tool => tool.name === name);
   };
 
   const handleAddMaterial = async () => {
     try {
-      // TODO: Set the _id of the tool matched with the name
+      const toolIds: string[] = [];
       for (const tool of toolInputs) {
         const toolExists = await checkIfToolExists(tool.name);
         if (toolExists) {
-          showDuplicateToolToast();
           return;
+        } else {
+          await addToolToUser(tool);
+          toolIds.push(tool._id);
         }
       }
+
+      const newMaterialWithIds = {
+        ...newMaterial,
+        tools: toolIds,
+      };
 
       for (const material of materials) {
         if (material.name === newMaterial.name) {
@@ -93,11 +92,7 @@ const MaterialList = () => {
         }
       }
 
-      await addMaterialToUser(newMaterial);
-      for (const tool of toolInputs) {
-        await addToolToUser(tool);
-      }
-
+      await addMaterialToUser(newMaterialWithIds);
       setNewMaterial(getInitialState());
       setIsAddItemModalVisible(false);
       setToolInputs([]);

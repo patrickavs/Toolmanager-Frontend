@@ -101,19 +101,19 @@ const DetailView = () => {
   };
 
   const addItemInput = () => {
-    let newItem;
+    let newItem: Material | Tool;
     if (type === 'Tool') {
       newItem = {
         _id: ObjectID().toHexString(),
         name: '',
-        tools: [editedItem._id],
+        tools: [item._id],
         description: '',
       };
     } else {
       newItem = {
         _id: ObjectID().toHexString(),
         name: '',
-        materials: [editedItem._id],
+        materials: [item._id],
         description: '',
       };
     }
@@ -190,13 +190,13 @@ const DetailView = () => {
                 )}
               </View>
             ))}
-            {isEditing && (
+            {isEditing && inputs.length < 4 ? (
               <Button
                 title="Add Material"
                 onPress={addItemInput}
                 color="green"
               />
-            )}
+            ) : null}
           </View>
         )}
         {type === 'Material' && (
@@ -227,9 +227,9 @@ const DetailView = () => {
                 )}
               </View>
             ))}
-            {isEditing && (
+            {isEditing && inputs.length < 4 ? (
               <Button title="Add Tool" onPress={addItemInput} color="green" />
-            )}
+            ) : null}
           </View>
         )}
       </View>
