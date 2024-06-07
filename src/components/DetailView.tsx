@@ -106,14 +106,14 @@ const DetailView = () => {
       newItem = {
         _id: ObjectID().toHexString(),
         name: '',
-        materials: [editedItem._id],
+        tools: [editedItem._id],
         description: '',
       };
     } else {
       newItem = {
         _id: ObjectID().toHexString(),
         name: '',
-        tools: [editedItem._id],
+        materials: [editedItem._id],
         description: '',
       };
     }
@@ -168,6 +168,7 @@ const DetailView = () => {
             {inputs.map((material: Material, index: number) => (
               <View key={material._id} style={styles.inputContainer}>
                 {isEditing ? (
+                  // TODO: Fetch material for the given _id and display the name of it
                   <>
                     <TextInput
                       style={styles.textInput}
@@ -204,6 +205,7 @@ const DetailView = () => {
             {inputs.map((tool: Tool, index: number) => (
               <View key={tool._id} style={styles.inputContainer}>
                 {isEditing ? (
+                  // TODO: Fetch tool for the given _id and display the name of it
                   <>
                     <TextInput
                       style={styles.textInput}

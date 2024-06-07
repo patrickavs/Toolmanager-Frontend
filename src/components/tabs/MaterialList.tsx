@@ -182,7 +182,9 @@ const MaterialList = () => {
           </View>
         ))}
         <View style={styles.addToolButtonContainer}>
-          <Button title={'Add Tool'} onPress={addToolInput} color={'green'} />
+          {toolInputs.length < 4 ? (
+            <Button title={'Add Tool'} onPress={addToolInput} color={'green'} />
+          ) : null}
         </View>
       </>
     );
