@@ -20,6 +20,7 @@ import Tool from '../Tool.ts';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useMaterials from '../hooks/useMaterials.ts';
+import {get_Material} from '../../service/api.ts';
 
 const getInitialState = () => ({
   _id: ObjectID().toHexString(),
@@ -32,8 +33,13 @@ const MaterialList = () => {
   const navigation = useNavigation();
   const materials = useMaterials();
   const {fetchMaterialsFromUser} = useUserContext();
-  const {addMaterialToUser, deleteMaterialFromUser, addToolToUser, tools} =
-    useUserContext();
+  const {
+    addMaterialToUser,
+    deleteMaterialFromUser,
+    addToolToUser,
+    tools,
+    updateToolFromUser,
+  } = useUserContext();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isAddItemModalVisible, setIsAddItemModalVisible] = useState(false);
   const [newMaterial, setNewMaterial] = useState<Material>(getInitialState());
@@ -63,20 +69,37 @@ const MaterialList = () => {
     );
   };
 
-  const checkIfToolExists = async (name: string) => {
-    return tools.some(tool => tool.name === name);
+  const addNewToolToUser = async (tool: Tool, toolIds: string[]) => {
+    const newTool = {
+      ...tool,
+      materials: [newMaterial._id],
+    };
+    await addToolToUser(newTool);
+    toolIds.push(newTool._id);
   };
 
   const handleAddMaterial = async () => {
     try {
       const toolIds: string[] = [];
-      for (const tool of toolInputs) {
-        const toolExists = await checkIfToolExists(tool.name);
-        if (toolExists) {
-          return;
-        } else {
-          await addToolToUser(tool);
-          toolIds.push(tool._id);
+      if (tools) {
+        for (const tool of toolInputs) {
+          if (tools.length > 0) {
+            const existingTool = tools.find(t => t.name === tool.name);
+            if (existingTool) {
+              // Update the existing tool with the new tool ID
+              await updateToolFromUser(existingTool._id, {
+                ...existingTool,
+                materials: [...existingTool.materials, newMaterial._id],
+              });
+              toolIds.push(existingTool._id);
+            } else {
+              // Add the new tool to the user
+              await addNewToolToUser(tool, toolIds);
+            }
+          } else {
+            // Add the new tool to the user
+            await addNewToolToUser(tool, toolIds);
+          }
         }
       }
 
@@ -85,8 +108,8 @@ const MaterialList = () => {
         tools: toolIds,
       };
 
-      for (const material of materials) {
-        if (material.name === newMaterial.name) {
+      if (materials.length > 0) {
+        if (materials.some(m => m.name === newMaterial.name)) {
           showDuplicateMaterialToast();
           return;
         }
@@ -103,6 +126,18 @@ const MaterialList = () => {
 
   const handleDeleteMaterial = async (id: string) => {
     try {
+      const material: Tool = await get_Material(id);
+      if (tools.length > 0) {
+        for (const tool of tools) {
+          const newMaterialsForTool = tool.materials.filter(
+            materialId => material._id !== materialId,
+          );
+          await updateToolFromUser(tool._id, {
+            ...tool,
+            materials: newMaterialsForTool,
+          });
+        }
+      }
       await deleteMaterialFromUser(id);
     } catch (error) {
       console.error('Error deleting material:', error);
@@ -120,7 +155,7 @@ const MaterialList = () => {
       setToolInputs(updatedTools);
       setNewMaterial({
         ...newMaterial,
-        tools: updatedTools,
+        tools: updatedTools.map(tool => tool._id),
       });
     } else {
       setNewMaterial({...newMaterial, [name]: value});
@@ -140,7 +175,7 @@ const MaterialList = () => {
   const removeToolInput = (index: number) => {
     const updatedTools = toolInputs.filter((_: Tool, i: number) => i !== index);
     setToolInputs(updatedTools);
-    setNewMaterial({...newMaterial, tools: updatedTools});
+    setNewMaterial({...newMaterial, tools: updatedTools.map(tool => tool._id)});
   };
 
   const renderModalFields = () => {
@@ -186,15 +221,15 @@ const MaterialList = () => {
   };
 
   const filterMaterials = useCallback(
-    (materials: Material[], filterValue: string) => {
-      return materials.filter(material =>
-        material.name.toLowerCase().includes(filterValue.toLowerCase()),
-      );
+    (materialsForFilter: Material[], filterValue: string) => {
+      if (materialsForFilter.length > 0) {
+        return materialsForFilter.filter(material =>
+          material.name.toLowerCase().includes(filterValue.toLowerCase()),
+        );
+      }
     },
     [],
   );
-
-  // probably adding sorting
 
   const filteredMaterials = useMemo(() => {
     return filterMaterials(materials, filterValue);

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,12 @@ import Material from './Material.ts';
 import ObjectID from 'bson-objectid';
 import {useItemsContext} from '../context/ItemsContext.tsx';
 import {useUserContext} from '../context/UserContext.tsx';
-import {get_Materials_For_User, get_Tools_For_User} from '../service/api.ts';
+import {
+  get_Material,
+  get_Materials_For_User,
+  get_Tool,
+  get_Tools_For_User,
+} from '../service/api.ts';
 
 const DetailView = () => {
   const route = useRoute<any>();
@@ -22,12 +27,36 @@ const DetailView = () => {
   const {item, type} = route.params;
   const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} =
     useItemsContext();
-  const {addMaterialToUser, addToolToUser, user} = useUserContext();
+  const {
+    addMaterialToUser,
+    addToolToUser,
+    user,
+    updateMaterialFromUser,
+    updateToolFromUser,
+  } = useUserContext();
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
   const [inputs, setInputs] = useState(
     type === 'Tool' ? item.materials : item.tools,
   );
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (type === 'Tool') {
+        const fetchedMaterials: Material[] = await Promise.all(
+          item.materials.map((materialId: string) => fetchMaterial(materialId)),
+        );
+        setInputs(fetchedMaterials);
+      } else if (type === 'Material') {
+        const fetchedTools: Tool[] = await Promise.all(
+          item.tools.map((toolId: string) => fetchTool(toolId)),
+        );
+        setInputs(fetchedTools);
+      }
+    };
+
+    fetchDetails();
+  }, [item, type, fetchTool, fetchMaterial]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -38,7 +67,7 @@ const DetailView = () => {
 
     try {
       if (type === 'Tool') {
-        await modifyTool(item._id, editedItem);
+        //await updateToolFromUser(item._id, editedItem);
 
         if (inputs.length > 0) {
           const materials: Material[] = await get_Materials_For_User(
@@ -46,18 +75,31 @@ const DetailView = () => {
           );
 
           for (const material of inputs as Material[]) {
-            const materialExists = materials.some(
+            const materialExists = materials.find(
               materialListMaterial =>
                 material.name === materialListMaterial.name,
             );
 
             if (!materialExists) {
               await addMaterialToUser(material);
+            } else {
+              const existingMaterial = inputs.find(
+                (input: any) => input.name === material.name,
+              );
+              const updatedMaterial = {
+                ...existingMaterial,
+                tools: [...existingMaterial.tools, item._id],
+              };
+              await updateMaterialFromUser(
+                existingMaterial._id,
+                updatedMaterial,
+              );
             }
           }
         }
 
-        const updatedTool = await fetchTool(item._id);
+        await updateToolFromUser(item._id, editedItem);
+        const updatedTool: Tool = await get_Tool(item._id);
         setEditedItem(updatedTool);
       } else if (type === 'Material') {
         await modifyMaterial(item._id, editedItem);
@@ -76,7 +118,7 @@ const DetailView = () => {
           }
         }
 
-        const updatedMaterial = await fetchMaterial(item._id);
+        const updatedMaterial: Material = await get_Material(item._id);
         setEditedItem(updatedMaterial);
       }
 
@@ -120,13 +162,99 @@ const DetailView = () => {
     setInputs([...inputs, newItem]);
   };
 
-  const removeItemInput = (index: number) => {
+  const removeItemInput = async (index: number) => {
     const updatedInputs = inputs.filter((_: any, i: number) => i !== index);
+    const removedItem = inputs[index];
+
+    if (type === 'Tool') {
+      // Remove material from tool's materials array
+      const updatedTool = {
+        ...editedItem,
+        materials: updatedInputs.map((input: Material) => input._id),
+      };
+      setEditedItem(updatedTool);
+      await updateToolFromUser(item._id, updatedTool);
+
+      // Update the material's tools array in the user's materials list
+      const updatedMaterial = {
+        ...removedItem,
+        tools: removedItem.tools.filter(
+          (toolId: string) => toolId !== item._id,
+        ),
+      };
+      await updateMaterialFromUser(removedItem._id, updatedMaterial);
+    } else if (type === 'Material') {
+      // Remove tool from material's tools array
+      const updatedMaterial = {
+        ...editedItem,
+        tools: updatedInputs.map((input: Tool) => input._id),
+      };
+      setEditedItem(updatedMaterial);
+      await updateMaterialFromUser(item._id, updatedMaterial);
+
+      // Update the tool's materials array in the user's tools list
+      const updatedTool = {
+        ...removedItem,
+        materials: removedItem.materials.filter(
+          (materialId: string) => materialId !== item._id,
+        ),
+      };
+      await updateToolFromUser(removedItem._id, updatedTool);
+    }
+
     setInputs(updatedInputs);
-    setEditedItem({
-      ...editedItem,
-      [type === 'Tool' ? 'materials' : 'tools']: updatedInputs,
-    });
+  };
+
+  const addNewMaterial = async (newMaterial: Material) => {
+    const materialExists = await checkIfMaterialExists(newMaterial.name);
+    if (materialExists) {
+      const existingMaterial = inputs.find(
+        (input: any) => input.name === newMaterial.name,
+      );
+      const updatedMaterial = {
+        ...existingMaterial,
+        tools: [...existingMaterial.tools, item._id],
+      };
+      await updateMaterialFromUser(existingMaterial._id, updatedMaterial);
+    } else {
+      const newMaterialWithTool = {
+        ...newMaterial,
+        tools: [item._id],
+      };
+      await addMaterialToUser(newMaterialWithTool);
+    }
+  };
+
+  const addNewTool = async (newTool: Tool) => {
+    const toolExists = await checkIfToolExists(newTool.name);
+    if (toolExists) {
+      const existingTool = inputs.find(
+        (input: any) => input.name === newTool.name,
+      );
+      const updatedTool = {
+        ...existingTool,
+        materials: [...existingTool.materials, item._id],
+      };
+      await updateToolFromUser(existingTool._id, updatedTool);
+    } else {
+      const newToolWithMaterial = {
+        ...newTool,
+        materials: [item._id],
+      };
+      await addToolToUser(newToolWithMaterial);
+    }
+  };
+
+  const checkIfMaterialExists = async (name: string) => {
+    const materials: Material[] = await get_Materials_For_User(
+      user?.email || '',
+    );
+    return materials.some(material => material.name === name);
+  };
+
+  const checkIfToolExists = async (name: string) => {
+    const tools: Tool[] = await get_Tools_For_User(user?.email || '');
+    return tools.some(tool => tool.name === name);
   };
 
   return (

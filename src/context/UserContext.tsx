@@ -19,6 +19,10 @@ import {
   add_Material,
   remove_Tool,
   remove_Material,
+  update_Tool,
+  update_Material,
+  get_Tools,
+  get_Materials,
 } from '../service/api.ts';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
@@ -35,6 +39,8 @@ interface UserContextType {
   fetchMaterialsFromUser: () => Promise<void>;
   addToolToUser: (newTool: Tool) => Promise<void>;
   addMaterialToUser: (newMaterial: Material) => Promise<void>;
+  updateToolFromUser: (id: string, newTool: Tool) => Promise<void>;
+  updateMaterialFromUser: (id: string, newMaterial: Material) => Promise<void>;
   deleteToolFromUser: (id: string) => Promise<void>;
   deleteMaterialFromUser: (id: string) => Promise<void>;
   loginUser: (email: string, password: string) => Promise<void>;
@@ -117,6 +123,19 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
     await fetchMaterialsFromUser();
   };
 
+  const updateToolFromUser = async (id: string, updatedTool: Tool) => {
+    await update_Tool(id, updatedTool);
+    await fetchToolsFromUser();
+  };
+
+  const updateMaterialFromUser = async (
+    id: string,
+    updatedMaterial: Material,
+  ) => {
+    await update_Material(id, updatedMaterial);
+    await fetchMaterialsFromUser();
+  };
+
   const deleteToolFromUser = async (id: string) => {
     await remove_Tool_From_User(user?.email || '', id);
     await remove_Tool(id);
@@ -161,6 +180,8 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
         fetchMaterialsFromUser: fetchMaterialsFromUser,
         addToolToUser,
         addMaterialToUser,
+        updateToolFromUser,
+        updateMaterialFromUser,
         deleteToolFromUser,
         deleteMaterialFromUser,
         loginUser,

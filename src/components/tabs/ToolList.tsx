@@ -20,6 +20,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useTools from '../hooks/useTools.ts';
+import {get_Tool} from '../../service/api.ts';
 
 const getInitialState = () => ({
   _id: ObjectID().toHexString(),
@@ -34,6 +35,7 @@ const ToolList = () => {
   const {
     fetchToolsFromUser,
     addToolToUser,
+    updateMaterialFromUser,
     deleteToolFromUser,
     addMaterialToUser,
     materials,
@@ -68,20 +70,40 @@ const ToolList = () => {
     );
   };
 
-  const checkIfMaterialExists = async (name: string) => {
-    return materials.some(material => material.name === name);
+  const addNewMaterialToUser = async (
+    material: Material,
+    materialIds: string[],
+  ) => {
+    const newMaterial = {
+      ...material,
+      tools: [newTool._id],
+    };
+    await addMaterialToUser(newMaterial);
+    materialIds.push(newMaterial._id);
   };
 
   const handleAddTool = async () => {
     try {
       const materialIds: string[] = [];
       for (const material of materialInputs) {
-        const materialExists = await checkIfMaterialExists(material.name);
-        if (materialExists) {
-          return;
+        if (materials.length > 0) {
+          const existingMaterial = materials.find(
+            m => m.name === material.name,
+          );
+          if (existingMaterial) {
+            // Update the existing material with the new tool ID
+            await updateMaterialFromUser(existingMaterial._id, {
+              ...existingMaterial,
+              tools: [...existingMaterial.tools, newTool._id],
+            });
+            materialIds.push(existingMaterial._id);
+          } else {
+            // Add the new material to the user
+            await addNewMaterialToUser(material, materialIds);
+          }
         } else {
-          await addMaterialToUser(material);
-          materialIds.push(material._id);
+          // Add the new material to the user
+          await addNewMaterialToUser(material, materialIds);
         }
       }
 
@@ -90,8 +112,8 @@ const ToolList = () => {
         materials: materialIds,
       };
 
-      for (const tool of tools) {
-        if (tool.name === newTool.name) {
+      if (tools.length > 0) {
+        if (tools.some(t => t.name === newTool.name)) {
           showDuplicateToolToast();
           return;
         }
@@ -108,6 +130,18 @@ const ToolList = () => {
 
   const handleDeleteTool = async (id: string) => {
     try {
+      const tool: Tool = await get_Tool(id);
+      if (materials.length > 0) {
+        for (const material of materials) {
+          const newToolsForMaterial = material.tools.filter(
+            toolId => tool._id !== toolId,
+          );
+          await updateMaterialFromUser(material._id, {
+            ...material,
+            tools: newToolsForMaterial,
+          });
+        }
+      }
       await deleteToolFromUser(id);
     } catch (error) {
       console.error('Error deleting tool:', error);
@@ -197,16 +231,22 @@ const ToolList = () => {
     );
   };
 
-  const filterTools = useCallback((tools: Tool[], filterValue: string) => {
-    return tools.filter(tool =>
-      tool.name.toLowerCase().includes(filterValue.toLowerCase()),
-    );
-  }, []);
+  const filterTools = useCallback(
+    (toolsForFilter: any[], filteredValue: string) => {
+      if (toolsForFilter.length > 0) {
+        return toolsForFilter.filter(tool =>
+          tool.name.toLowerCase().includes(filteredValue.toLowerCase()),
+        );
+      }
+      return [];
+    },
+    [],
+  );
 
   // probably adding sorting
 
   const filteredTools = useMemo(() => {
-    return filterTools(tools, filterValue);
+    return filterTools(tools, filterValue) || [];
   }, [tools, filterValue, filterTools]);
 
   const renderTool = ({item}: {item: Tool}) => (

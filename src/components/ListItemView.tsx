@@ -43,6 +43,7 @@ const ListItem: React.FC<ListItemProps> = ({item, onDeleteItem}) => {
           modalVisible={deleteModalVisible}
           buttonPressAction={() => onDeleteItem(item._id)}
           deleteAction={true}
+          buttonDisabled={false}
         />
       </View>
     </>

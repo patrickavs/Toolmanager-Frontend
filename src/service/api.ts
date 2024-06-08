@@ -40,6 +40,7 @@ api.interceptors.response.use(
       if (navigation) {
         navigation.navigate('Login');
       }
+      originalRequest._retry = false;
       return;
       //return Promise.reject(new Error('Session expired. Please log in again.'));
     }
