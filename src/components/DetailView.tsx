@@ -56,7 +56,7 @@ const DetailView = () => {
     };
 
     fetchDetails();
-  }, [item, type, fetchTool, fetchMaterial]);
+  }, [item, type]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -86,14 +86,19 @@ const DetailView = () => {
               const existingMaterial = inputs.find(
                 (input: any) => input.name === material.name,
               );
-              const updatedMaterial = {
-                ...existingMaterial,
-                tools: [...existingMaterial.tools, item._id],
+              const existingToolInMaterials = () => {
+                return existingMaterial.tools.includes(item._id);
               };
-              await updateMaterialFromUser(
-                existingMaterial._id,
-                updatedMaterial,
-              );
+              if (!existingToolInMaterials) {
+                const updatedMaterial = {
+                  ...existingMaterial,
+                  tools: [...existingMaterial.tools, item._id],
+                };
+                await updateMaterialFromUser(
+                  existingMaterial._id,
+                  updatedMaterial,
+                );
+              }
             }
           }
         }
@@ -101,6 +106,7 @@ const DetailView = () => {
         await updateToolFromUser(item._id, editedItem);
         const updatedTool: Tool = await get_Tool(item._id);
         setEditedItem(updatedTool);
+        await fetchTool(item._id);
       } else if (type === 'Material') {
         await modifyMaterial(item._id, editedItem);
 
@@ -114,12 +120,27 @@ const DetailView = () => {
 
             if (!toolExists) {
               await addToolToUser(tool);
+            } else {
+              const existingTool = inputs.find(
+                (input: any) => input.name === tool.name,
+              );
+              const existingMaterialInTools = () => {
+                return existingTool.materials.includes(item._id);
+              };
+              if (!existingMaterialInTools) {
+                const updatedTool = {
+                  ...existingTool,
+                  materials: [...existingTool.materials, item._id],
+                };
+                await updateToolFromUser(existingTool._id, updatedTool);
+              }
             }
           }
         }
 
         const updatedMaterial: Material = await get_Material(item._id);
         setEditedItem(updatedMaterial);
+        await fetchMaterial(item._id);
       }
 
       console.log('Updated item:', editedItem);
@@ -142,8 +163,8 @@ const DetailView = () => {
     });
   };
 
-  const addItemInput = () => {
-    let newItem: Material | Tool;
+  const addItemInput = async () => {
+    let newItem: any;
     if (type === 'Tool') {
       newItem = {
         _id: ObjectID().toHexString(),
@@ -333,7 +354,6 @@ const DetailView = () => {
             {inputs.map((tool: Tool, index: number) => (
               <View key={tool._id} style={styles.inputContainer}>
                 {isEditing ? (
-                  // TODO: Fetch tool for the given _id and display the name of it
                   <>
                     <TextInput
                       style={styles.textInput}

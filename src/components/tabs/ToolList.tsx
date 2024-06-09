@@ -84,6 +84,12 @@ const ToolList = () => {
 
   const handleAddTool = async () => {
     try {
+      if (tools.length > 0) {
+        if (tools.some(t => t.name === newTool.name)) {
+          showDuplicateToolToast();
+          return;
+        }
+      }
       const materialIds: string[] = [];
       for (const material of materialInputs) {
         if (materials.length > 0) {
@@ -91,6 +97,13 @@ const ToolList = () => {
             m => m.name === material.name,
           );
           if (existingMaterial) {
+            if (existingMaterial.tools.length === 4) {
+              ToastAndroid.show(
+                `${existingMaterial.name} has already reached the limit of tools. Please modify ${existingMaterial.name}`,
+                ToastAndroid.SHORT,
+              );
+              continue;
+            }
             // Update the existing material with the new tool ID
             await updateMaterialFromUser(existingMaterial._id, {
               ...existingMaterial,
@@ -111,13 +124,6 @@ const ToolList = () => {
         ...newTool,
         materials: materialIds,
       };
-
-      if (tools.length > 0) {
-        if (tools.some(t => t.name === newTool.name)) {
-          showDuplicateToolToast();
-          return;
-        }
-      }
 
       await addToolToUser(newToolWithIds);
       setNewTool(getInitialState());
@@ -251,6 +257,7 @@ const ToolList = () => {
 
   const renderTool = ({item}: {item: Tool}) => (
     <Pressable
+      key={item._id}
       onPress={() =>
         //@ts-ignore
         navigation.navigate('DetailView', {item: item, type: 'Tool'})
