@@ -293,7 +293,8 @@ const DetailView = () => {
                 )}
               </View>
             ))}
-            {(isEditing && inputs.length < 4) || item.materials.length < 4 ? (
+            {(isEditing && inputs.length < 4) ||
+            (!isEditing && item.materials.length > 4) ? (
               <Button
                 title="Add Material"
                 onPress={addItemInput}
@@ -329,7 +330,8 @@ const DetailView = () => {
                 )}
               </View>
             ))}
-            {(isEditing && inputs.length < 4) || item.tools.length < 4 ? (
+            {(isEditing && inputs.length < 4) ||
+            (!isEditing && item.tools.length > 4) ? (
               <Button title="Add Tool" onPress={addItemInput} color="green" />
             ) : null}
           </View>
