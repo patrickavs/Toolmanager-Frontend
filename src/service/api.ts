@@ -30,11 +30,6 @@ api.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
-      ToastAndroid.showWithGravity(
-        'Session expired. Please sign in again',
-        ToastAndroid.SHORT,
-        ToastAndroid.TOP,
-      );
       originalRequest._retry = true;
       await Keychain.resetGenericPassword();
       if (navigation) {
@@ -44,6 +39,11 @@ api.interceptors.response.use(
       return;
       //return Promise.reject(new Error('Session expired. Please log in again.'));
     }
+    ToastAndroid.showWithGravity(
+      'Session expired. Please sign in again',
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+    );
     //return Promise.reject(error);
   },
 );
