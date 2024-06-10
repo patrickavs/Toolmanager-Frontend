@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -33,6 +33,8 @@ const DetailView = () => {
     user,
     updateMaterialFromUser,
     updateToolFromUser,
+    tools,
+    materials,
   } = useUserContext();
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
@@ -66,6 +68,18 @@ const DetailView = () => {
 
     try {
       if (type === 'Tool') {
+        const sameNameAlreadyInTools = tools.find(
+          (tool: Tool) =>
+            tool.name === editedItem.name && tool._id !== editedItem._id,
+        );
+        if (sameNameAlreadyInTools) {
+          ToastAndroid.show(
+            `${editedItem.name} is already in the list. Give another name instead`,
+            ToastAndroid.SHORT,
+          );
+          setIsEditing(true);
+          return;
+        }
         const materialIds = await handleMaterialsUpdate();
 
         await updateToolFromUser(item._id, {
@@ -77,6 +91,19 @@ const DetailView = () => {
         setEditedItem(updatedTool);
         await fetchTool(item._id);
       } else if (type === 'Material') {
+        const sameNameAlreadyInMaterials = materials.find(
+          (material: Material) =>
+            material.name === editedItem.name &&
+            material._id !== editedItem._id,
+        );
+        if (sameNameAlreadyInMaterials) {
+          ToastAndroid.show(
+            `${editedItem.name} is already in the list. Give another name instead`,
+            ToastAndroid.SHORT,
+          );
+          setIsEditing(true);
+          return;
+        }
         const toolIds = await handleToolsUpdate();
 
         await updateMaterialFromUser(item._id, {
@@ -96,7 +123,8 @@ const DetailView = () => {
   };
 
   const handleMaterialsUpdate = async () => {
-    const materials: Material[] = await get_Materials_For_User(
+    // TODO: Maybe better to just use already declared materials from the context
+    const fetchedMaterials: Material[] = await get_Materials_For_User(
       user?.email || '',
     );
     const materialIds: string[] = [];
@@ -106,7 +134,7 @@ const DetailView = () => {
         continue;
       } // Skip empty material names
 
-      const materialExists = materials.find(
+      const materialExists = fetchedMaterials.find(
         materialListMaterial => material.name === materialListMaterial.name,
       );
 
@@ -141,7 +169,8 @@ const DetailView = () => {
   };
 
   const handleToolsUpdate = async () => {
-    const tools: Tool[] = await get_Tools_For_User(user?.email || '');
+    // TODO: Maybe better to just use already declared tools from the context
+    const fetchedTools: Tool[] = await get_Tools_For_User(user?.email || '');
     const toolIds: string[] = [];
 
     for (const tool of [...inputs, ...tempInputs] as Tool[]) {
@@ -149,7 +178,7 @@ const DetailView = () => {
         continue;
       } // Skip empty tool names
 
-      const toolExists = tools.find(
+      const toolExists = fetchedTools.find(
         toolListTool => tool.name === toolListTool.name,
       );
 
