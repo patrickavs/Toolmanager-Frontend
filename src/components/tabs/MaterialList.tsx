@@ -94,8 +94,7 @@ const MaterialList = () => {
             if (existingTool) {
               if (existingTool.materials.length === 4) {
                 ToastAndroid.show(
-                  `${existingTool.name} has already reached the limit of materials. 
-                Please modify ${existingTool.name}`,
+                  `${existingTool.name} has already reached the limit of materials`,
                   ToastAndroid.SHORT,
                 );
                 continue;

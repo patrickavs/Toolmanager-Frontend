@@ -99,7 +99,7 @@ const ToolList = () => {
           if (existingMaterial) {
             if (existingMaterial.tools.length === 4) {
               ToastAndroid.show(
-                `${existingMaterial.name} has already reached the limit of tools. Please modify ${existingMaterial.name}`,
+                `${existingMaterial.name} has already reached the limit of tools`,
                 ToastAndroid.SHORT,
               );
               continue;

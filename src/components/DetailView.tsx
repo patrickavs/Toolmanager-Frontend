@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Button,
   TouchableOpacity,
   TextInput,
+  ToastAndroid,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -25,8 +26,7 @@ const DetailView = () => {
   const route = useRoute<any>();
   const navigation = useNavigation();
   const {item, type} = route.params;
-  const {modifyTool, modifyMaterial, fetchTool, fetchMaterial} =
-    useItemsContext();
+  const {fetchTool, fetchMaterial} = useItemsContext();
   const {
     addMaterialToUser,
     addToolToUser,
@@ -37,6 +37,7 @@ const DetailView = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState(item);
   const [inputs, setInputs] = useState<any[]>([]);
+  const [tempInputs, setTempInputs] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -100,10 +101,11 @@ const DetailView = () => {
     );
     const materialIds: string[] = [];
 
-    for (const material of inputs as Material[]) {
-      if (material.name === '') {
+    for (const material of [...inputs, ...tempInputs] as Material[]) {
+      if (!material.name.trim()) {
         continue;
-      }
+      } // Skip empty material names
+
       const materialExists = materials.find(
         materialListMaterial => material.name === materialListMaterial.name,
       );
@@ -118,6 +120,14 @@ const DetailView = () => {
         materialIds.push(newMaterial._id);
       } else {
         if (!materialExists.tools.includes(item._id)) {
+          if (materialExists.tools.length === 4) {
+            ToastAndroid.show(
+              `${materialExists.name} has already reached the limit of tools`,
+              ToastAndroid.SHORT,
+            );
+            setTempInputs([]);
+            continue;
+          }
           const updatedMaterial = {
             ...materialExists,
             tools: [...materialExists.tools, item._id],
@@ -134,10 +144,11 @@ const DetailView = () => {
     const tools: Tool[] = await get_Tools_For_User(user?.email || '');
     const toolIds: string[] = [];
 
-    for (const tool of inputs as Tool[]) {
-      if (tool.name === '') {
+    for (const tool of [...inputs, ...tempInputs] as Tool[]) {
+      if (!tool.name.trim()) {
         continue;
       } // Skip empty tool names
+
       const toolExists = tools.find(
         toolListTool => tool.name === toolListTool.name,
       );
@@ -152,6 +163,14 @@ const DetailView = () => {
         toolIds.push(newTool._id);
       } else {
         if (!toolExists.materials.includes(item._id)) {
+          if (toolExists.materials.length === 4) {
+            ToastAndroid.show(
+              `${toolExists.name} has already reached the limit of materials`,
+              ToastAndroid.SHORT,
+            );
+            setTempInputs([]);
+            continue;
+          }
           const updatedTool = {
             ...toolExists,
             materials: [...toolExists.materials, item._id],
@@ -168,13 +187,17 @@ const DetailView = () => {
     setEditedItem({...editedItem, [name]: value});
   };
 
-  const handleItemChange = (index: number, value: string) => {
-    const updatedInputs = [...inputs];
+  const handleItemChange = (
+    index: number,
+    value: string,
+    isTemp: boolean = false,
+  ) => {
+    const updatedInputs = isTemp ? [...tempInputs] : [...inputs];
     updatedInputs[index].name = value;
-    setInputs(updatedInputs);
+    isTemp ? setTempInputs(updatedInputs) : setInputs(updatedInputs);
   };
 
-  const addItemInput = async () => {
+  const addItemInput = () => {
     let newItem: any;
     if (type === 'Tool') {
       newItem = {
@@ -191,7 +214,14 @@ const DetailView = () => {
         description: '',
       };
     }
-    setInputs([...inputs, newItem]);
+    setTempInputs([...tempInputs, newItem]);
+  };
+
+  const removeTempInput = (index: number) => {
+    const updatedTempInputs = tempInputs.filter(
+      (_: any, i: number) => i !== index,
+    );
+    setTempInputs(updatedTempInputs);
   };
 
   const removeItemInput = async (index: number) => {
@@ -293,7 +323,31 @@ const DetailView = () => {
                 )}
               </View>
             ))}
-            {(isEditing && inputs.length < 4) ||
+            {tempInputs.map((material: Material, index: number) => (
+              <View key={material._id} style={styles.inputContainer}>
+                {isEditing ? (
+                  <>
+                    <TextInput
+                      style={styles.textInput}
+                      value={material.name}
+                      onChangeText={text => handleItemChange(index, text, true)}
+                    />
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => removeTempInput(index)}>
+                      <Ionicons
+                        name="remove-circle-outline"
+                        size={24}
+                        color="red"
+                      />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <Text style={styles.material}>{material.name}</Text>
+                )}
+              </View>
+            ))}
+            {(isEditing && tempInputs.length + item.materials.length < 4) ||
             (!isEditing && item.materials.length > 4) ? (
               <Button
                 title="Add Material"
@@ -330,7 +384,31 @@ const DetailView = () => {
                 )}
               </View>
             ))}
-            {(isEditing && inputs.length < 4) ||
+            {tempInputs.map((tool: Tool, index: number) => (
+              <View key={tool._id} style={styles.inputContainer}>
+                {isEditing ? (
+                  <>
+                    <TextInput
+                      style={styles.textInput}
+                      value={tool.name}
+                      onChangeText={text => handleItemChange(index, text, true)}
+                    />
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => removeTempInput(index)}>
+                      <Ionicons
+                        name="remove-circle-outline"
+                        size={24}
+                        color="red"
+                      />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <Text style={styles.tool}>{tool.name}</Text>
+                )}
+              </View>
+            ))}
+            {(isEditing && tempInputs.length + item.tools.length < 4) ||
             (!isEditing && item.tools.length > 4) ? (
               <Button title="Add Tool" onPress={addItemInput} color="green" />
             ) : null}
