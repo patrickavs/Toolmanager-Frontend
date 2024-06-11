@@ -360,6 +360,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   filterInput: {
+    elevation: 3,
     flex: 1,
     borderWidth: 1,
     padding: 10,

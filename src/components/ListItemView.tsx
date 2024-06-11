@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginHorizontal: 10,
     backgroundColor: 'lightgray',
-    elevation: 2,
     borderRadius: 10,
     alignItems: 'center',
     paddingStart: 10,
