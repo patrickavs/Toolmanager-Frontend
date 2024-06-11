@@ -21,8 +21,6 @@ import {
   remove_Material,
   update_Tool,
   update_Material,
-  get_Tools,
-  get_Materials,
 } from '../service/api.ts';
 import Tool from '../components/Tool.ts';
 import Material from '../components/Material.ts';
