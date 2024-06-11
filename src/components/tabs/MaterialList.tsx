@@ -145,6 +145,10 @@ const MaterialList = () => {
         }
       }
       await deleteMaterialFromUser(id);
+      ToastAndroid.show(
+        `Successfully deleted ${material.name}`,
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
       console.error('Error deleting material:', error);
     }
