@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  ToastAndroid,
 } from 'react-native';
 import {get_Users, register} from '../../service/api.ts';
 import {useNavigation} from '@react-navigation/native';
@@ -30,16 +31,6 @@ const RegisterView: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const emailExisting = async () => {
-      const users: User[] = await get_Users();
-      for (const user of users) {
-        if (user.email === email) {
-          return true;
-        }
-      }
-      return false;
-    };
-
     const validateForm = async () => {
       let errorProps = {name: '', email: '', password: ''};
 
@@ -53,8 +44,6 @@ const RegisterView: React.FC = () => {
         errorProps.email = 'Email is required.';
       } else if (!/\S+@\S+\.\S+/.test(email)) {
         errorProps.email = 'Email is invalid.';
-      } else if (await emailExisting()) {
-        errorProps.email = 'Email is already in use.';
       }
 
       // Validate password field
@@ -72,7 +61,21 @@ const RegisterView: React.FC = () => {
     validateForm();
   }, [name, email, password]);
 
+  const emailExisting = async () => {
+    const users: User[] = await get_Users();
+    for (const user of users) {
+      if (user.email === email) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const handleRegister = async () => {
+    if (await emailExisting()) {
+      ToastAndroid.show('Email already in use', ToastAndroid.SHORT);
+      return;
+    }
     if (isFormValid) {
       setLoading(true);
       try {
