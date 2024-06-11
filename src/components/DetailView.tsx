@@ -126,6 +126,7 @@ const DetailView = () => {
         await fetchMaterial(item._id);
       }
 
+      ToastAndroid.show('Changes saved', ToastAndroid.SHORT);
       console.log('Updated item:', editedItem);
     } catch (error) {
       console.error('Error saving item:', error);
