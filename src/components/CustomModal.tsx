@@ -1,11 +1,4 @@
-import {
-  Button,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {Button, Modal, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
 interface CustomModalProps {

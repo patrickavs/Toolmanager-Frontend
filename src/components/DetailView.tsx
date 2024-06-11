@@ -68,6 +68,11 @@ const DetailView = () => {
 
     try {
       if (type === 'Tool') {
+        if (editedItem.name === '') {
+          ToastAndroid.show('Please fill in a name', ToastAndroid.SHORT);
+          setIsEditing(true);
+          return;
+        }
         const sameNameAlreadyInTools = tools.find(
           (tool: Tool) =>
             tool.name === editedItem.name && tool._id !== editedItem._id,
@@ -91,6 +96,11 @@ const DetailView = () => {
         setEditedItem(updatedTool);
         await fetchTool(item._id);
       } else if (type === 'Material') {
+        if (editedItem.name === '') {
+          ToastAndroid.show('Please fill in a name', ToastAndroid.SHORT);
+          setIsEditing(true);
+          return;
+        }
         const sameNameAlreadyInMaterials = materials.find(
           (material: Material) =>
             material.name === editedItem.name &&
