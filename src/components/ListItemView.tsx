@@ -37,7 +37,6 @@ const ListItem: React.FC<ListItemProps> = ({item, onDeleteItem}) => {
           </TouchableOpacity>
         </View>
         <CustomModal
-          title={'Warning'}
           fields={renderFieldsDelete()}
           action={() => setDeleteModalVisible(false)}
           modalVisible={deleteModalVisible}

@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  ToastAndroid,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {update_User} from '../service/api.ts';
@@ -68,6 +69,8 @@ const EditProfile = () => {
         aboutMe: aboutMe,
         bio: bio,
       });
+
+      ToastAndroid.show('Changes saved', ToastAndroid.SHORT);
       console.log('Form submitted successfully!');
       navigation.goBack();
     } else {
