@@ -3,7 +3,6 @@ import {
   FlatList,
   TextInput,
   View,
-  StyleSheet,
   Text,
   TouchableOpacity,
   Button,
@@ -21,6 +20,7 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useUserContext} from '../../context/UserContext.tsx';
 import useMaterials from '../hooks/useMaterials.ts';
 import {get_Material} from '../../service/api.ts';
+import {listStyles} from '../../styles/listStyle.ts';
 
 const getInitialState = () => ({
   _id: ObjectID().toHexString(),
@@ -193,23 +193,23 @@ const MaterialList = () => {
       <>
         <TextInput
           key="name"
-          style={styles.textInput}
+          style={listStyles.textInput}
           placeholder="Name"
           onChangeText={text => handleInputChange('name', text)}
           value={newMaterial.name || ''}
         />
         <TextInput
           key="description"
-          style={styles.textInput}
+          style={listStyles.textInput}
           placeholder="Description"
           onChangeText={text => handleInputChange('description', text)}
           value={newMaterial.description || ''}
         />
-        <Text style={styles.toolTitle}>Tools</Text>
+        <Text style={listStyles.toolTitle}>Tools</Text>
         {toolInputs.map((tool: Tool, index: number) => (
-          <View key={`${tool._id}`} style={styles.toolInputContainer}>
+          <View key={`${tool._id}`} style={listStyles.toolInputContainer}>
             <TextInput
-              style={styles.textInput}
+              style={listStyles.textInput}
               placeholder="Tool Name"
               onChangeText={text => handleInputChange('tools', text, index)}
               value={tool.name || ''}
@@ -221,7 +221,7 @@ const MaterialList = () => {
             </TouchableOpacity>
           </View>
         ))}
-        <View style={styles.addToolButtonContainer}>
+        <View style={listStyles.addToolButtonContainer}>
           {toolInputs.length < 4 ? (
             <Button title={'Add Tool'} onPress={addToolInput} color={'green'} />
           ) : null}
@@ -262,9 +262,9 @@ const MaterialList = () => {
 
   return (
     <>
-      <View style={styles.filterContainer}>
+      <View style={listStyles.filterContainer}>
         <TextInput
-          style={styles.filterInput}
+          style={listStyles.filterInput}
           placeholder="Filter materials..."
           onChangeText={text => setFilterValue(text)}
           value={filterValue}
@@ -295,69 +295,5 @@ const MaterialList = () => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 30,
-    width: '80%',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  textInput: {
-    borderWidth: 1,
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 10,
-    flexGrow: 1,
-    backgroundColor: 'white',
-    borderColor: '#ccc',
-  },
-  toolTitle: {
-    fontSize: 17,
-    paddingVertical: 10,
-  },
-  addToolButtonContainer: {
-    paddingHorizontal: 50,
-    paddingVertical: 10,
-  },
-  toolInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-    paddingTop: 20,
-  },
-  filterInput: {
-    elevation: 3,
-    flex: 1,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: 'white',
-    borderColor: '#ccc',
-  },
-});
 
 export default MaterialList;
