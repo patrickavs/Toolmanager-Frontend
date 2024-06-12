@@ -120,7 +120,7 @@ export const ItemsProvider = ({children}: {children: ReactNode}) => {
 export const useItemsContext = () => {
   const context = useContext(ItemsContext);
   if (context === undefined) {
-    throw new Error('useItems must be used within an ItemsProvider');
+    throw new Error('useItemsContext must be used within an ItemsProvider');
   }
   return context;
 };
