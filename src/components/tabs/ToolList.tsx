@@ -129,6 +129,7 @@ const ToolList = () => {
       setNewTool(getInitialState());
       setIsAddItemModalVisible(false);
       setMaterialInputs([]);
+      ToastAndroid.show('Successfully added Tool', ToastAndroid.SHORT);
     } catch (error) {
       console.error('Error adding tool:', error);
     }

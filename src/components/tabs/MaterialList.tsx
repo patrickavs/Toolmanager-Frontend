@@ -125,6 +125,7 @@ const MaterialList = () => {
       setNewMaterial(getInitialState());
       setIsAddItemModalVisible(false);
       setToolInputs([]);
+      ToastAndroid.show('Successfully added Material', ToastAndroid.SHORT);
     } catch (error) {
       console.error('Error adding material:', error);
     }
