@@ -7,34 +7,13 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {UserProvider, useUserContext} from './context/UserContext.tsx';
 import {setNavigation} from './service/api.ts';
 import {ToastAndroid} from 'react-native';
-import {useNetInfo} from '@react-native-community/netinfo';
+import NetInfo, {useNetInfo} from '@react-native-community/netinfo';
 
 const AppStack = createNativeStackNavigator();
 
 function AppNavigator() {
   const navigation = useNavigation();
   const {setRegisteredUser} = useUserContext();
-  const netInfo = useNetInfo();
-
-  useEffect(() => {
-    if (!netInfo.isConnected) {
-      ToastAndroid.show('No Internet Connection!', ToastAndroid.SHORT);
-    } else if (netInfo.type === 'cellular' || netInfo.type === 'wifi') {
-      const checkSpeed = async () => {
-        const startTime = Date.now();
-        try {
-          await fetch('https://www.google.com');
-          const responseTime = Date.now() - startTime;
-          if (responseTime > 1000) {
-            ToastAndroid.show('Slow Network', ToastAndroid.SHORT);
-          }
-        } catch (error) {
-          console.log('Error fetching Test-URL:', error);
-        }
-      };
-      checkSpeed();
-    }
-  }, [netInfo]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -77,10 +56,32 @@ function AppNavigator() {
 }
 const App: React.FC = () => {
   const navigationRef = useRef(null);
+  const state = useNetInfo();
 
   useEffect(() => {
     setNavigation(navigationRef.current);
   }, [navigationRef]);
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        ToastAndroid.show('No Internet Connection!', ToastAndroid.SHORT);
+      } else if (netInfo.type === 'cellular' || netInfo.type === 'wifi') {
+        const startTime = Date.now();
+        try {
+          await fetch('https://www.google.com');
+          const responseTime = Date.now() - startTime;
+          if (responseTime > 1000) {
+            ToastAndroid.show('Slow Network', ToastAndroid.SHORT);
+          }
+        } catch (error) {
+          console.log('Error fetching Test-URL:', error);
+        }
+      }
+    };
+    checkConnection();
+  }, [state]);
 
   return (
     <UserProvider>
