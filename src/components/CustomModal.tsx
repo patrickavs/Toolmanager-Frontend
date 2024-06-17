@@ -31,17 +31,18 @@ export const CustomModal: React.FC<CustomModalProps> = ({
           {!title ? null : <Text style={styles.modalTitle}>{title}</Text>}
           {fields}
           <View style={styles.buttonContainer}>
-            <Button title="Cancel" onPress={() => action()} />
+            <Button title="Abbrechen" onPress={() => action()} />
             {deleteAction ? (
               <Button
-                title={'Delete'}
+                title={'Entfernen'}
                 color={'red'}
                 onPress={buttonPressAction}
               />
             ) : (
               <Button
-                title="Save"
+                title="Speichern"
                 onPress={buttonPressAction}
+                color={'green'}
                 disabled={buttonDisabled}
               />
             )}

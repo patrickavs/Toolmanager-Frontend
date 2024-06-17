@@ -48,7 +48,7 @@ const ProfileView = () => {
       //@ts-ignore
       navigation.navigate('Auth', {screen: 'Login'});
     } catch (error) {
-      console.error('Logout failed', error);
+      console.log('Logout failed', error);
     }
   };
 
@@ -82,7 +82,7 @@ const ProfileView = () => {
   if (!user) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Failed to load user data</Text>
+        <Text>Laden der Daten fehlgeschlagen</Text>
       </View>
     );
   }
@@ -104,12 +104,12 @@ const ProfileView = () => {
       </View>
       <View style={styles.body}>
         <Text h4 style={styles.sectionTitle}>
-          About Me
+          Über mich
         </Text>
         <Text style={styles.sectionContent}>{user.aboutMe}</Text>
         <Button
           icon={<Icon name="pencil" type="ionicon" color="#fff" />}
-          title=" Edit Profile"
+          title=" Profil anpassen"
           //@ts-ignore
           onPress={() => navigation.navigate('Edit', {user: user})}
         />
@@ -117,12 +117,12 @@ const ProfileView = () => {
       <View style={styles.actions}>
         <Button
           icon={<Icon name="log-out-outline" type="ionicon" color="#fff" />}
-          title=" Logout"
+          title=" Ausloggen"
           onPress={handleLogout}
         />
         <Button
           icon={<Icon name="trash-outline" type="ionicon" color="#fff" />}
-          title=" Delete Account"
+          title=" Account löschen"
           onPress={confirmDeleteAccount}
           buttonStyle={styles.deleteButton}
         />
@@ -131,12 +131,12 @@ const ProfileView = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
-              Are you sure you want to delete your account?
+              Bist du sicher, dass du deinen Account löschen möchtest?
             </Text>
             <View style={styles.modalButtons}>
-              <Button title="Cancel" onPress={cancelDeleteAccount} />
+              <Button title="Abbrechen" onPress={cancelDeleteAccount} />
               <Button
-                title="Delete"
+                title="Löschen"
                 onPress={() => proceedDeleteAccount(user?.email)}
                 buttonStyle={styles.deleteButton}
               />

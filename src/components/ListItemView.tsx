@@ -14,7 +14,7 @@ const ListItem: React.FC<ListItemProps> = ({item, onDeleteItem}) => {
   const renderFieldsDelete = () => {
     return (
       <Text style={styles.deleteFieldText}>
-        Are you sure to delete {item.name}?
+        Bist du sicher {item.name} zu löschen?
       </Text>
     );
   };

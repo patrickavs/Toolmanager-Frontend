@@ -36,21 +36,21 @@ const RegisterView: React.FC = () => {
 
       // Validate name field
       if (!name) {
-        errorProps.name = 'Name is required.';
+        errorProps.name = 'Name wird benötigt.';
       }
 
       // Validate email field
       if (!email) {
-        errorProps.email = 'Email is required.';
+        errorProps.email = 'E-mail wird benötigt.';
       } else if (!/\S+@\S+\.\S+/.test(email)) {
-        errorProps.email = 'Email is invalid.';
+        errorProps.email = 'Ungültige E-mail.';
       }
 
       // Validate password field
       if (!password) {
-        errorProps.password = 'Password is required.';
+        errorProps.password = 'Passwort wird benötigt.';
       } else if (password.length < 8) {
-        errorProps.password = 'Password must be at least 8 characters.';
+        errorProps.password = 'Passwort muss mindestens 8 Zeichen lang sein.';
       }
 
       setErrors(errorProps);
@@ -73,25 +73,28 @@ const RegisterView: React.FC = () => {
 
   const handleRegister = async () => {
     if (await emailExisting()) {
-      ToastAndroid.show('Email already in use', ToastAndroid.SHORT);
+      ToastAndroid.show('E-mail wird bereits genutzt', ToastAndroid.SHORT);
       return;
     }
     if (isFormValid) {
       setLoading(true);
       try {
         await register(name, email, password);
-        Alert.alert('Registration Successful', 'You can now login.');
+        Alert.alert(
+          'Registrierung erfolgreich',
+          'Du kannst dich nun einloggen.',
+        );
         navigation.goBack();
       } catch (error) {
         Alert.alert(
-          'Registration Failed',
-          'An error occurred during registration.',
+          'Registrierung fehlgeschlagen',
+          'Ein Fehler ist während der registrierung aufgetreten.',
         );
       } finally {
         setLoading(false);
       }
     } else {
-      Alert.alert('Form has errors', 'Please correct them.');
+      Alert.alert('Das Formular beinhaltet Fehler', 'Bitte korrigiere diese.');
     }
   };
 
@@ -102,7 +105,7 @@ const RegisterView: React.FC = () => {
         source={require('../../assets/images/signUp.png')}
         style={styles.image}
       />
-      <Text style={styles.header}>Register</Text>
+      <Text style={styles.header}>Registrierung</Text>
       <TextInput
         style={styles.input}
         placeholder="Name"
@@ -111,7 +114,7 @@ const RegisterView: React.FC = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="E-mail"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -119,7 +122,7 @@ const RegisterView: React.FC = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Passwort"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -130,7 +133,7 @@ const RegisterView: React.FC = () => {
         disabled={!isFormValid}
         onPress={handleRegister}>
         <Text style={styles.buttonText}>
-          {!loading ? 'Register' : 'Registering'}
+          {!loading ? 'Registrierung' : 'registrieren..'}
         </Text>
       </TouchableOpacity>
 

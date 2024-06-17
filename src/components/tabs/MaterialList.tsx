@@ -62,10 +62,9 @@ const MaterialList = () => {
   };
 
   const showDuplicateMaterialToast = () => {
-    ToastAndroid.showWithGravity(
-      'A material with the same name already exists.',
+    ToastAndroid.show(
+      'Ein Material mit demselben Namen existiert bereits',
       ToastAndroid.SHORT,
-      ToastAndroid.CENTER,
     );
   };
 
@@ -94,7 +93,7 @@ const MaterialList = () => {
             if (existingTool) {
               if (existingTool.materials.length === 4) {
                 ToastAndroid.show(
-                  `${existingTool.name} has already reached the limit of materials`,
+                  `${existingTool.name} hat bereits die maximale Anzahl an Materialien erreicht`,
                   ToastAndroid.SHORT,
                 );
                 continue;
@@ -125,9 +124,12 @@ const MaterialList = () => {
       setNewMaterial(getInitialState());
       setIsAddItemModalVisible(false);
       setToolInputs([]);
-      ToastAndroid.show('Successfully added Material', ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `${newMaterial.name} erfolgreich hinzugefügt`,
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
-      console.error('Error adding material:', error);
+      console.log('Error adding material:', error);
     }
   };
 
@@ -147,11 +149,11 @@ const MaterialList = () => {
       }
       await deleteMaterialFromUser(id);
       ToastAndroid.show(
-        `Successfully deleted ${material.name}`,
+        `${material.name} erfolgreich entfernt`,
         ToastAndroid.SHORT,
       );
     } catch (error) {
-      console.error('Error deleting material:', error);
+      console.log('Error deleting material:', error);
     }
   };
 
@@ -202,16 +204,16 @@ const MaterialList = () => {
         <TextInput
           key="description"
           style={listStyles.textInput}
-          placeholder="Description"
+          placeholder="Beschreibung"
           onChangeText={text => handleInputChange('description', text)}
           value={newMaterial.description || ''}
         />
-        <Text style={listStyles.toolTitle}>Tools</Text>
+        <Text style={listStyles.toolTitle}>Werkzeuge</Text>
         {toolInputs.map((tool: Tool, index: number) => (
           <View key={`${tool._id}`} style={listStyles.toolInputContainer}>
             <TextInput
               style={listStyles.textInput}
-              placeholder="Tool Name"
+              placeholder="Name des Werkzeugs"
               onChangeText={text => handleInputChange('tools', text, index)}
               value={tool.name || ''}
             />
@@ -224,7 +226,11 @@ const MaterialList = () => {
         ))}
         <View style={listStyles.addToolButtonContainer}>
           {toolInputs.length < 4 ? (
-            <Button title={'Add Tool'} onPress={addToolInput} color={'green'} />
+            <Button
+              title={'Werkzeug hinzufügen'}
+              onPress={addToolInput}
+              color={'green'}
+            />
           ) : null}
         </View>
       </>
@@ -266,7 +272,7 @@ const MaterialList = () => {
       <View style={listStyles.filterContainer}>
         <TextInput
           style={listStyles.filterInput}
-          placeholder="Filter materials..."
+          placeholder="Nach Materialien filtern..."
           onChangeText={text => setFilterValue(text)}
           value={filterValue}
         />
@@ -282,7 +288,7 @@ const MaterialList = () => {
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <CustomModal
-        title="Add New Material"
+        title="Neues Material hinzufügen"
         fields={renderModalFields()}
         action={() => {
           setIsAddItemModalVisible(false);

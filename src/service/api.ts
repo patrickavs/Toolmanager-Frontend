@@ -146,9 +146,18 @@ const handleRequest = async (request: () => Promise<any>) => {
   try {
     const response = await request();
     return response.data;
-  } catch (error) {
-    console.error('Request error:', error);
-    throw error;
+  } catch (error: any) {
+    if (error.response) {
+      const {status, data} = error.response;
+      console.error(`Error ${status}: ${data.message || data}`);
+      throw new Error(`Error ${status}: ${data.message || data}`);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+      throw new Error('No response received from server');
+    } else {
+      console.error('Request error:', error.message);
+      throw new Error(`Request error: ${error.message}`);
+    }
   }
 };
 

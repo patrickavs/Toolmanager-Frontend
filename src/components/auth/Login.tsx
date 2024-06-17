@@ -25,7 +25,10 @@ const LoginView: React.FC = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password.');
+      Alert.alert(
+        'Error',
+        'Bitte gebe sowohl E-mail als auch das Passwort ein.',
+      );
       return;
     }
 
@@ -37,7 +40,10 @@ const LoginView: React.FC = () => {
       navigation.navigate('Home');
       resetForm();
     } catch (error) {
-      Alert.alert('Login Failed', 'Invalid email or password.');
+      Alert.alert(
+        'Login fehlgeschlagen',
+        'Ungültige E-mail oder ungültiges Passwort.',
+      );
     } finally {
       setLoading(false);
     }
@@ -59,7 +65,7 @@ const LoginView: React.FC = () => {
       <Text style={styles.header}>Login</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="E-mail"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -67,7 +73,7 @@ const LoginView: React.FC = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Passwort"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -85,7 +91,7 @@ const LoginView: React.FC = () => {
       {/*@ts-ignore*/}
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.linkText}>
-          Don't have an account? Register here
+          Noch keinen Account? Registriere dich hier.
         </Text>
       </TouchableOpacity>
     </View>

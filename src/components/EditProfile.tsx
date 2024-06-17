@@ -35,7 +35,7 @@ const EditProfile = () => {
   }, [name, email, aboutMe, bio]);
 
   if (!user) {
-    return <Text>Failed to fetch data</Text>;
+    return <Text>Fehler beim Laden der Daten</Text>;
   }
 
   const validateForm = () => {
@@ -46,14 +46,14 @@ const EditProfile = () => {
 
     // Validate name field
     if (!name) {
-      errorProps.name = 'Name is required.';
+      errorProps.name = 'Name wird benötigt.';
     }
 
     // Validate email field
     if (!email) {
-      errorProps.email = 'Email is required.';
+      errorProps.email = 'E-mail wird benötigt.';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errorProps.email = 'Email is invalid.';
+      errorProps.email = 'Ungültige E-mail.';
     }
 
     setErrors(errorProps);
@@ -70,7 +70,7 @@ const EditProfile = () => {
         bio: bio,
       });
 
-      ToastAndroid.show('Changes saved', ToastAndroid.SHORT);
+      ToastAndroid.show('Änderungen gespeichert', ToastAndroid.SHORT);
       console.log('Form submitted successfully!');
       navigation.goBack();
     } else {
@@ -81,7 +81,7 @@ const EditProfile = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Text style={styles.header}>Edit Profile</Text>
+        <Text style={styles.header}>Profil</Text>
         <TextInput
           style={styles.input}
           placeholder="Name"
@@ -90,19 +90,19 @@ const EditProfile = () => {
         />
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="E-mail"
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
-          placeholder="About Me"
+          placeholder="Über mich"
           value={aboutMe}
           onChangeText={setAboutMe}
         />
         <TextInput
           style={styles.input}
-          placeholder="Bio"
+          placeholder="Biografie"
           value={bio}
           onChangeText={setBio}
         />
@@ -110,7 +110,7 @@ const EditProfile = () => {
           style={[styles.button, {opacity: isFormValid ? 1 : 0.5}]}
           disabled={!isFormValid}
           onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
+          <Text style={styles.buttonText}>Speichern</Text>
         </TouchableOpacity>
 
         {/* Display error messages */}

@@ -69,7 +69,7 @@ const DetailView = () => {
     try {
       if (type === 'Tool') {
         if (editedItem.name === '') {
-          ToastAndroid.show('Please fill in a name', ToastAndroid.SHORT);
+          ToastAndroid.show('Bitte einen Namen eingeben', ToastAndroid.SHORT);
           setIsEditing(true);
           return;
         }
@@ -79,7 +79,7 @@ const DetailView = () => {
         );
         if (sameNameAlreadyInTools) {
           ToastAndroid.show(
-            `${editedItem.name} is already in the list. Give another name instead`,
+            `${editedItem.name} ist bereits in der Liste. Vergebe bitte einen anderen Namen`,
             ToastAndroid.SHORT,
           );
           setIsEditing(true);
@@ -97,7 +97,7 @@ const DetailView = () => {
         await fetchTool(item._id);
       } else if (type === 'Material') {
         if (editedItem.name === '') {
-          ToastAndroid.show('Please fill in a name', ToastAndroid.SHORT);
+          ToastAndroid.show('Bitte einen Namen eingeben', ToastAndroid.SHORT);
           setIsEditing(true);
           return;
         }
@@ -108,7 +108,7 @@ const DetailView = () => {
         );
         if (sameNameAlreadyInMaterials) {
           ToastAndroid.show(
-            `${editedItem.name} is already in the list. Give another name instead`,
+            `${editedItem.name} ist bereits in der Liste. Vergebe bitte einen anderen Namen`,
             ToastAndroid.SHORT,
           );
           setIsEditing(true);
@@ -126,10 +126,10 @@ const DetailView = () => {
         await fetchMaterial(item._id);
       }
 
-      ToastAndroid.show('Changes saved', ToastAndroid.SHORT);
+      ToastAndroid.show('Änderungen gespeichert', ToastAndroid.SHORT);
       console.log('Updated item:', editedItem);
     } catch (error) {
-      console.error('Error saving item:', error);
+      console.log('Error saving item:', error);
     }
   };
 
@@ -161,7 +161,7 @@ const DetailView = () => {
         if (!materialExists.tools.includes(item._id)) {
           if (materialExists.tools.length === 4) {
             ToastAndroid.show(
-              `${materialExists.name} has already reached the limit of tools`,
+              `${materialExists.name} hat bereits die maximale Anzahl an Werkzeugen erreicht`,
               ToastAndroid.SHORT,
             );
             setTempInputs([]);
@@ -205,7 +205,7 @@ const DetailView = () => {
         if (!toolExists.materials.includes(item._id)) {
           if (toolExists.materials.length === 4) {
             ToastAndroid.show(
-              `${toolExists.name} has already reached the limit of materials`,
+              `${toolExists.name} hat bereits die maximale Anzahl an Materialien erreicht`,
               ToastAndroid.SHORT,
             );
             setTempInputs([]);
@@ -338,7 +338,7 @@ const DetailView = () => {
         )}
         {type === 'Tool' && (
           <View>
-            <Text style={styles.sectionTitle}>Materials:</Text>
+            <Text style={styles.sectionTitle}>Materialien:</Text>
             {inputs.map((material: Material, index: number) => (
               <View key={material._id} style={styles.inputContainer}>
                 {isEditing ? (
@@ -390,7 +390,7 @@ const DetailView = () => {
             {(isEditing && tempInputs.length + item.materials.length < 4) ||
             (!isEditing && item.materials.length > 4) ? (
               <Button
-                title="Add Material"
+                title="Material hinzufügen"
                 onPress={addItemInput}
                 color="green"
               />
@@ -399,7 +399,7 @@ const DetailView = () => {
         )}
         {type === 'Material' && (
           <View>
-            <Text style={styles.sectionTitle}>Tools:</Text>
+            <Text style={styles.sectionTitle}>Werkzeuge:</Text>
             {inputs.map((tool: Tool, index: number) => (
               <View key={tool._id} style={styles.inputContainer}>
                 {isEditing ? (
@@ -450,14 +450,18 @@ const DetailView = () => {
             ))}
             {(isEditing && tempInputs.length + item.tools.length < 4) ||
             (!isEditing && item.tools.length > 4) ? (
-              <Button title="Add Tool" onPress={addItemInput} color="green" />
+              <Button
+                title="Werkzeug hinzufügen"
+                onPress={addItemInput}
+                color="green"
+              />
             ) : null}
           </View>
         )}
       </View>
       <View style={styles.buttonContainer}>
         <Button
-          title="Back"
+          title="Zurück"
           onPress={() => navigation.goBack()}
           color="#1E90FF"
         />

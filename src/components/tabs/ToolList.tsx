@@ -64,7 +64,7 @@ const ToolList = () => {
 
   const showDuplicateToolToast = () => {
     ToastAndroid.showWithGravity(
-      'A tool with the same name already exists.',
+      'Ein Werkzeug mit demselben Namen existiert bereits',
       ToastAndroid.SHORT,
       ToastAndroid.CENTER,
     );
@@ -99,7 +99,7 @@ const ToolList = () => {
           if (existingMaterial) {
             if (existingMaterial.tools.length === 4) {
               ToastAndroid.show(
-                `${existingMaterial.name} has already reached the limit of tools`,
+                `${existingMaterial.name} hat bereits die maximale Anzahl an Werkzeugen erreicht`,
                 ToastAndroid.SHORT,
               );
               continue;
@@ -129,9 +129,12 @@ const ToolList = () => {
       setNewTool(getInitialState());
       setIsAddItemModalVisible(false);
       setMaterialInputs([]);
-      ToastAndroid.show('Successfully added Tool', ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `${newTool.name} erfolgreich hinzugefügt`,
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
-      console.error('Error adding tool:', error);
+      console.log('Error adding tool:', error);
     }
   };
 
@@ -151,11 +154,11 @@ const ToolList = () => {
       }
       await deleteToolFromUser(id);
       ToastAndroid.show(
-        `Successfully deleted ${tool.name}`,
+        `${tool.name} erfolgreich entfernt`,
         ToastAndroid.SHORT,
       );
     } catch (error) {
-      console.error('Error deleting tool:', error);
+      console.log('Error deleting tool:', error);
     }
   };
 
@@ -209,18 +212,18 @@ const ToolList = () => {
         <TextInput
           key="description"
           style={listStyles.textInput}
-          placeholder="Description"
+          placeholder="Beschreibung"
           onChangeText={text => handleInputChange('description', text)}
           value={newTool.description || ''}
         />
-        <Text style={listStyles.materialTitle}>Materials</Text>
+        <Text style={listStyles.materialTitle}>Materialien</Text>
         {materialInputs.map((material: Material, index: number) => (
           <View
             key={`${material._id}`}
             style={listStyles.materialInputContainer}>
             <TextInput
               style={listStyles.textInput}
-              placeholder="Material Name"
+              placeholder="Name des Materials"
               onChangeText={text => handleInputChange('materials', text, index)}
               value={material.name || ''}
             />
@@ -234,7 +237,7 @@ const ToolList = () => {
         <View style={listStyles.addMaterialButtonContainer}>
           {materialInputs.length < 4 ? (
             <Button
-              title={'Add Material'}
+              title={'Material hinzufügen'}
               onPress={addMaterialInput}
               color={'green'}
             />
@@ -278,7 +281,7 @@ const ToolList = () => {
       <View style={listStyles.filterContainer}>
         <TextInput
           style={listStyles.filterInput}
-          placeholder="Filter tools..."
+          placeholder="Nach Werkzeugen filtern..."
           onChangeText={text => setFilterValue(text)}
           value={filterValue}
         />
@@ -294,7 +297,7 @@ const ToolList = () => {
       />
       <CustomFAB action={() => setIsAddItemModalVisible(true)} />
       <CustomModal
-        title={'Add New Tool'}
+        title={'Neues Werkzeug hinzufügen'}
         fields={renderModalFields()}
         action={() => {
           setIsAddItemModalVisible(false);
