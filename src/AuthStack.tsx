@@ -13,7 +13,11 @@ function AuthStackScreen() {
         component={LoginView}
         options={{headerShown: false}}
       />
-      <AuthStack.Screen name="Register" component={RegisterView} />
+      <AuthStack.Screen
+        name="Register"
+        component={RegisterView}
+        options={{headerTitle: ''}}
+      />
     </AuthStack.Navigator>
   );
 }
