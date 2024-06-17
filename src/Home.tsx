@@ -16,10 +16,14 @@ const UserStack = createNativeStackNavigator();
 function UserStackScreen() {
   return (
     <UserStack.Navigator
-      initialRouteName="Profile"
+      initialRouteName="Profil"
       screenOptions={{headerStyle: {backgroundColor: '#63b0f4'}}}>
-      <UserStack.Screen name="Profile" component={ProfileView} />
-      <UserStack.Screen name="Edit" component={EditProfile} />
+      <UserStack.Screen name="Profil" component={ProfileView} />
+      <UserStack.Screen
+        name="Edit"
+        component={EditProfile}
+        options={{headerTitle: ''}}
+      />
     </UserStack.Navigator>
   );
 }
@@ -27,10 +31,10 @@ function UserStackScreen() {
 function ToolStackScreen() {
   return (
     <ToolStack.Navigator
-      initialRouteName="Tools"
+      initialRouteName="Werkzeuge"
       screenOptions={{headerStyle: {backgroundColor: '#63b0f4'}}}>
-      <ToolStack.Screen name="Tools" component={ToolList} />
-      <ToolStack.Screen name="DetailView" component={DetailView} />
+      <ToolStack.Screen name="Werkzeuge" component={ToolList} />
+      <ToolStack.Screen name="Detail-Ansicht" component={DetailView} />
     </ToolStack.Navigator>
   );
 }
@@ -38,10 +42,10 @@ function ToolStackScreen() {
 function MaterialStackScreen() {
   return (
     <MaterialStack.Navigator
-      initialRouteName="Materials"
+      initialRouteName="Materialien"
       screenOptions={{headerStyle: {backgroundColor: '#63b0f4'}}}>
-      <MaterialStack.Screen name="Materials" component={MaterialList} />
-      <MaterialStack.Screen name="DetailView" component={DetailView} />
+      <MaterialStack.Screen name="Materialien" component={MaterialList} />
+      <MaterialStack.Screen name="Detail-Ansicht" component={DetailView} />
     </MaterialStack.Navigator>
   );
 }

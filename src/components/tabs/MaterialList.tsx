@@ -257,7 +257,7 @@ const MaterialList = () => {
       key={item._id}
       onPress={() =>
         //@ts-ignore
-        navigation.navigate('DetailView', {item: item, type: 'Material'})
+        navigation.navigate('Detail-Ansicht', {item: item, type: 'Material'})
       }>
       <ListItem
         key={item._id}

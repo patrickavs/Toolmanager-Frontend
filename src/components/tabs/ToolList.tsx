@@ -270,7 +270,7 @@ const ToolList = () => {
       key={item._id}
       onPress={() =>
         //@ts-ignore
-        navigation.navigate('DetailView', {item: item, type: 'Tool'})
+        navigation.navigate('Detail-Ansicht', {item: item, type: 'Tool'})
       }>
       <ListItem key={item._id} item={item} onDeleteItem={handleDeleteTool} />
     </Pressable>
