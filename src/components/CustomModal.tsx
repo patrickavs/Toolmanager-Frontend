@@ -40,7 +40,7 @@ export const CustomModal: React.FC<CustomModalProps> = ({
               />
             ) : (
               <Button
-                title="Speichern"
+                title="Hinzufügen"
                 onPress={buttonPressAction}
                 color={'green'}
                 disabled={buttonDisabled}
