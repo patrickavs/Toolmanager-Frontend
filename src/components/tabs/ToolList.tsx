@@ -154,7 +154,7 @@ const ToolList = () => {
       }
       await deleteToolFromUser(id);
       ToastAndroid.show(
-        `${tool.name} erfolgreich entfernt`,
+        `${tool.name} erfolgreich gelöscht`,
         ToastAndroid.SHORT,
       );
     } catch (error) {

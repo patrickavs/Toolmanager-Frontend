@@ -149,7 +149,7 @@ const MaterialList = () => {
       }
       await deleteMaterialFromUser(id);
       ToastAndroid.show(
-        `${material.name} erfolgreich entfernt`,
+        `${material.name} erfolgreich gelöscht`,
         ToastAndroid.SHORT,
       );
     } catch (error) {
