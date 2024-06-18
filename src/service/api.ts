@@ -36,14 +36,14 @@ api.interceptors.response.use(
         navigation.navigate('Login');
       }
       originalRequest._retry = false;
+      ToastAndroid.showWithGravity(
+        'Session expired. Please sign in again',
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+      );
       return;
       //return Promise.reject(new Error('Session expired. Please log in again.'));
     }
-    ToastAndroid.showWithGravity(
-      'Session expired. Please sign in again',
-      ToastAndroid.SHORT,
-      ToastAndroid.TOP,
-    );
     //return Promise.reject(error);
   },
 );

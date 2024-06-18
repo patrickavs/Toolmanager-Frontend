@@ -34,7 +34,7 @@ export const CustomModal: React.FC<CustomModalProps> = ({
             <Button title="Abbrechen" onPress={() => action()} />
             {deleteAction ? (
               <Button
-                title={'Entfernen'}
+                title={'Löschen'}
                 color={'red'}
                 onPress={buttonPressAction}
               />
