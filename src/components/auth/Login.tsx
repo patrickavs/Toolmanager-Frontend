@@ -86,7 +86,7 @@ const LoginView: React.FC = () => {
         ]}
         disabled={loading || email === '' || password === ''}
         onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Einloggen</Text>
       </TouchableOpacity>
       {/*@ts-ignore*/}
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>

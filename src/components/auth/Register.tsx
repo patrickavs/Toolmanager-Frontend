@@ -133,7 +133,7 @@ const RegisterView: React.FC = () => {
         disabled={!isFormValid}
         onPress={handleRegister}>
         <Text style={styles.buttonText}>
-          {!loading ? 'Registrierung' : 'registrieren..'}
+          {!loading ? 'Registrieren' : 'registrieren..'}
         </Text>
       </TouchableOpacity>
 
